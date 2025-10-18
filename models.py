@@ -1,4 +1,5 @@
 from config import db
+from flask_jwt_extended import get_jwt_identity
 from datetime import datetime
 
 # table d association entre les livre et categories
@@ -19,6 +20,32 @@ class User(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     loans = db.relationship('Loan', backref='user', lazy=True)# relation one to many entre user et loan
+
+    @staticmethod
+    def current_is_admin():
+         user_id = get_jwt_identity()
+         user = User.query.get(user_id) 
+         return user.is_admin
+
+# est ce que l tilisateur est le proprietaire du compte
+    @staticmethod
+    def current_is_admin(user_id):
+        current_user_id = get_jwt_identity()
+        user = User.query.get(current_user_id) 
+        return user.is_admin or current_user_id == user_id
+
+# Hash  un mot de passe
+    @staticmethod
+    def hash_password(self,password):
+        from config import bcrypt
+        return bcrypt.generate_password_hash(password).decode('utf-8')
+    
+# verifier un mot de passe
+    @staticmethod
+    def check_password(self,password,hashed_password):
+        from config import bcrypt
+        return bcrypt.check_password_hash(hashed_password,password)
+
 
     def __repr__(self):
         return f'<User {self.username}>'

@@ -22,29 +22,24 @@ class User(db.Model):
     loans = db.relationship('Loan', backref='user', lazy=True)# relation one to many entre user et loan
 
     @staticmethod
-    def current_is_admin():
-         user_id = get_jwt_identity()
-         user = User.query.get(user_id) 
-         return user.is_admin
-
-# est ce que l tilisateur est le proprietaire du compte
-    @staticmethod
-    def current_is_admin(user_id):
+    def current_is_admin(user_id=None):
         current_user_id = get_jwt_identity()
-        user = User.query.get(current_user_id) 
+        user = User.query.get(current_user_id)
+        if user_id is None:
+            return user.is_admin
         return user.is_admin or current_user_id == user_id
 
 # Hash  un mot de passe
     @staticmethod
-    def hash_password(self,password):
+    def hash_password(password):
         from config import bcrypt
         return bcrypt.generate_password_hash(password).decode('utf-8')
     
 # verifier un mot de passe
     @staticmethod
-    def check_password(self,password,hashed_password):
+    def check_password(password, hashed_password):
         from config import bcrypt
-        return bcrypt.check_password_hash(hashed_password,password)
+        return bcrypt.check_password_hash(hashed_password, password)
 
 
     def __repr__(self):
@@ -65,15 +60,14 @@ class Ebook(db.Model):
     categories = db.relationship('Category', secondary=ebook_category, backref=db.backref('ebooks', lazy='dynamic')) # relation many to many entre ebook et category
     loans = db.relationship('Loan', backref='ebook', lazy=True) # relation one to many entre ebook et loan
 
-def __repr__(self):
+    def __repr__(self):
         return f'<Ebook {self.title} by {self.author}>'
 
 class Category(db.Model):
      __tablename__ = 'categories'
      id = db.Column(db.Integer, primary_key=True)
      name = db.Column(db.String(50), unique=True, nullable=False)
-
-     ebooks=db.relationship('Ebook', secondary=ebook_category, backref=db.backref('categories', lazy='dynamic')) # relation many to many entre ebook et category
+     description = db.Column(db.Text)
 
      def __repr__(self):
         return f'<Category {self.name}>'
@@ -91,7 +85,5 @@ class Loan(db.Model):
      user = db.relationship('User', backref=db.backref('loans', lazy=True)) # relation one to many entre user et loan
      ebook = db.relationship('Ebook', backref=db.backref('loans', lazy=True)) # relation one to many entre ebook et loan
 
-def __repr__(self):
+     def __repr__(self):
         return f'<Loan User {self.user_id} - Ebook {self.ebook_id}>'
-       
-          

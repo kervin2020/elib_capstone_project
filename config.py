@@ -10,7 +10,7 @@ class Config:
     SQLALCHEMY_DATABASE_URI = os.getenv('database_uri','sqlite:///bibliotheque.db')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     JWT_SECRET_KEY = os.getenv('jwt_secret_key','jwtsecret')
-    UPLOAD_FLODER = 'static/uploads'
+    UPLOAD_FOLDER = 'static/uploads'
 
 db = SQLAlchemy()
 jwt = JWTManager()

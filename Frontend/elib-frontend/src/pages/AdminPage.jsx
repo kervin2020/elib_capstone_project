@@ -18,7 +18,9 @@ import { useLoans } from '../contexts/LoanContext';
 import { useAdmin } from '../contexts/AdminContext';
 import { useToast } from '../contexts/ToastContext';
 import LoadingSpinner from '../components/common/LoadingSpinner';
+
 import ConfirmModal from '../components/common/ConfirmModal';
+
 import AddBookModal from '../components/books/AddBookModal';
 
 const AdminPage = () => {
@@ -105,7 +107,7 @@ const AdminPage = () => {
     setShowConfirmModal(true);
   };
 
-  const confirmActionfunc = async () => {
+  const confirmAction = async () => {
     if (!confirmAction) return;
 
     try {
@@ -295,8 +297,8 @@ const AdminPage = () => {
                   <button
                     onClick={() => handleBanUser(user.id, !user.is_banned)}
                     className={`${user.is_banned
-                      ? 'text-green-600 hover:text-green-900'
-                      : 'text-red-600 hover:text-red-900'
+                        ? 'text-green-600 hover:text-green-900'
+                        : 'text-red-600 hover:text-red-900'
                       }`}
                   >
                     {user.is_banned ? 'Unban' : 'Ban'}
@@ -433,8 +435,8 @@ const AdminPage = () => {
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
                   className={`py-4 px-1 border-b-2 font-medium text-sm flex items-center space-x-2 ${activeTab === tab.id
-                    ? 'border-primary-500 text-primary-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700'
+                      ? 'border-primary-500 text-primary-600'
+                      : 'border-transparent text-gray-500 hover:text-gray-700'
                     }`}
                 >
                   <tab.icon className="h-4 w-4" />
@@ -466,7 +468,7 @@ const AdminPage = () => {
         <ConfirmModal
           isOpen={showConfirmModal}
           onClose={() => setShowConfirmModal(false)}
-          onConfirm={confirmActionfunc}
+          onConfirm={confirmAction}
           title="Confirm Action"
           message={confirmAction?.message}
           type="danger"

@@ -1,13 +1,44 @@
-import React, { useState, useEffect } from 'react';
-import { useSearchParams } from 'react-router-dom';
-import { Search, Filter, Plus, Grid, List, Eye } from 'lucide-react';
-import { useAuth } from '../contexts/AuthContext';
-import { useBooks } from '../contexts/BookContext';
-import { useLoans } from '../contexts/LoanContext';
-import { useToast } from '../contexts/ToastContext';
+import React, {
+  useState, useEffect
+}
+  from 'react';
+
+import {
+  useSearchParams
+}
+  from 'react-router-dom';
+
+import {
+  Search, Filter, Plus, Grid, List, Eye
+}
+  from 'lucide-react';
+
+import {
+  useAuth
+}
+  from '../contexts/AuthContext';
+
+import {
+  useBooks
+}
+  from '../contexts/BookContext';
+
+import {
+  useLoans
+}
+  from '../contexts/LoanContext';
+
+import {
+  useToast
+}
+  from '../contexts/ToastContext';
+
 import BookCard from '../components/common/BookCard';
+
 import BookDetailModal from '../components/books/BookDetailModal';
+
 import AddBookModal from '../components/books/AddBookModal';
+
 import LoadingSpinner from '../components/common/LoadingSpinner';
 
 const BooksPage = () => {
@@ -215,7 +246,7 @@ const BooksPage = () => {
           <LoadingSpinner size="large" className="py-12" />
         ) : filteredBooks.length === 0 ? (
           <div className="text-center py-12">
-            <span className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+            <BookOpen className="h-12 w-12 text-gray-400 mx-auto mb-4" />
             <h3 className="text-lg font-medium text-gray-900 mb-2">No books found</h3>
             <p className="text-gray-600">
               Try adjusting your search criteria or filters

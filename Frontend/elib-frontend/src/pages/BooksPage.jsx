@@ -13,11 +13,11 @@ import LoadingSpinner from '../components/common/LoadingSpinner';
 const BooksPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const { user, isAuthenticated } = useAuth();
-  const { 
-    books, 
-    categories, 
-    searchQuery, 
-    selectedCategory, 
+  const {
+    books,
+    categories,
+    searchQuery,
+    selectedCategory,
     filters,
     isLoading,
     searchBooks,
@@ -95,7 +95,7 @@ const BooksPage = () => {
                 Browse our collection of digital and physical books
               </p>
             </div>
-            
+
             {user?.is_admin && (
               <button
                 onClick={() => setShowAddModal(true)}
@@ -215,7 +215,7 @@ const BooksPage = () => {
           <LoadingSpinner size="large" className="py-12" />
         ) : filteredBooks.length === 0 ? (
           <div className="text-center py-12">
-            <BookOpen className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+            <span className="h-12 w-12 text-gray-400 mx-auto mb-4" />
             <h3 className="text-lg font-medium text-gray-900 mb-2">No books found</h3>
             <p className="text-gray-600">
               Try adjusting your search criteria or filters
@@ -223,7 +223,7 @@ const BooksPage = () => {
           </div>
         ) : (
           <div className={
-            viewMode === 'grid' 
+            viewMode === 'grid'
               ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'
               : 'space-y-4'
           }>

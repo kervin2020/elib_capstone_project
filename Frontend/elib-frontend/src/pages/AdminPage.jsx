@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  Users, 
-  BookOpen, 
-  TrendingUp, 
+import {
+  Users,
+  BookOpen,
+  TrendingUp,
   AlertTriangle,
   Plus,
   Edit,
@@ -25,13 +25,13 @@ const AdminPage = () => {
   const { user } = useAuth();
   const { books, deleteBook } = useBooks();
   const { loans, stats: loanStats } = useLoans();
-  const { 
-    users, 
-    categories, 
-    stats, 
-    isLoading, 
-    fetchUsers, 
-    fetchCategories, 
+  const {
+    users,
+    categories,
+    stats,
+    isLoading,
+    fetchUsers,
+    fetchCategories,
     fetchStats,
     updateUser,
     deleteUser,
@@ -105,7 +105,7 @@ const AdminPage = () => {
     setShowConfirmModal(true);
   };
 
-  const confirmAction = async () => {
+  const confirmActionfunc = async () => {
     if (!confirmAction) return;
 
     try {
@@ -136,7 +136,7 @@ const AdminPage = () => {
           }
           break;
       }
-      
+
       if (result && !result.success) {
         error(result.error || 'Action failed');
       }
@@ -223,9 +223,8 @@ const AdminPage = () => {
                     </p>
                   </div>
                 </div>
-                <span className={`px-2 py-1 text-xs font-medium rounded-full ${
-                  loan.is_returned ? 'bg-green-100 text-green-800' : 'bg-blue-100 text-blue-800'
-                }`}>
+                <span className={`px-2 py-1 text-xs font-medium rounded-full ${loan.is_returned ? 'bg-green-100 text-green-800' : 'bg-blue-100 text-blue-800'
+                  }`}>
                   {loan.is_returned ? 'Returned' : 'Active'}
                 </span>
               </div>
@@ -281,27 +280,24 @@ const AdminPage = () => {
                   {user.email}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <span className={`px-2 py-1 text-xs font-medium rounded-full ${
-                    user.is_admin ? 'bg-purple-100 text-purple-800' : 'bg-gray-100 text-gray-800'
-                  }`}>
+                  <span className={`px-2 py-1 text-xs font-medium rounded-full ${user.is_admin ? 'bg-purple-100 text-purple-800' : 'bg-gray-100 text-gray-800'
+                    }`}>
                     {user.is_admin ? 'Admin' : 'User'}
                   </span>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <span className={`px-2 py-1 text-xs font-medium rounded-full ${
-                    user.is_banned ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'
-                  }`}>
+                  <span className={`px-2 py-1 text-xs font-medium rounded-full ${user.is_banned ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'
+                    }`}>
                     {user.is_banned ? 'Banned' : 'Active'}
                   </span>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
                   <button
                     onClick={() => handleBanUser(user.id, !user.is_banned)}
-                    className={`${
-                      user.is_banned 
-                        ? 'text-green-600 hover:text-green-900' 
-                        : 'text-red-600 hover:text-red-900'
-                    }`}
+                    className={`${user.is_banned
+                      ? 'text-green-600 hover:text-green-900'
+                      : 'text-red-600 hover:text-red-900'
+                      }`}
                   >
                     {user.is_banned ? 'Unban' : 'Ban'}
                   </button>
@@ -347,7 +343,7 @@ const AdminPage = () => {
                 <button className="p-1 text-gray-400 hover:text-gray-600">
                   <Edit className="h-4 w-4" />
                 </button>
-                <button 
+                <button
                   onClick={() => handleDeleteBook(book.id)}
                   className="p-1 text-red-400 hover:text-red-600"
                 >
@@ -355,17 +351,16 @@ const AdminPage = () => {
                 </button>
               </div>
             </div>
-            
+
             <h3 className="text-lg font-semibold text-gray-900 mb-2">{book.title}</h3>
             <p className="text-gray-600 mb-3">{book.author}</p>
-            
+
             <div className="flex items-center justify-between text-sm">
               <span className="text-gray-500">
                 {book.available_copies} of {book.total_copies} available
               </span>
-              <span className={`px-2 py-1 text-xs font-medium rounded-full ${
-                book.available_copies > 0 ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-              }`}>
+              <span className={`px-2 py-1 text-xs font-medium rounded-full ${book.available_copies > 0 ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                }`}>
                 {book.available_copies > 0 ? 'Available' : 'Unavailable'}
               </span>
             </div>
@@ -399,7 +394,7 @@ const AdminPage = () => {
                 <button className="p-1 text-gray-400 hover:text-gray-600">
                   <Edit className="h-4 w-4" />
                 </button>
-                <button 
+                <button
                   onClick={() => handleDeleteCategory(category.id)}
                   className="p-1 text-red-400 hover:text-red-600"
                 >
@@ -437,11 +432,10 @@ const AdminPage = () => {
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`py-4 px-1 border-b-2 font-medium text-sm flex items-center space-x-2 ${
-                    activeTab === tab.id
-                      ? 'border-primary-500 text-primary-600'
-                      : 'border-transparent text-gray-500 hover:text-gray-700'
-                  }`}
+                  className={`py-4 px-1 border-b-2 font-medium text-sm flex items-center space-x-2 ${activeTab === tab.id
+                    ? 'border-primary-500 text-primary-600'
+                    : 'border-transparent text-gray-500 hover:text-gray-700'
+                    }`}
                 >
                   <tab.icon className="h-4 w-4" />
                   <span>{tab.label}</span>
@@ -472,7 +466,7 @@ const AdminPage = () => {
         <ConfirmModal
           isOpen={showConfirmModal}
           onClose={() => setShowConfirmModal(false)}
-          onConfirm={confirmAction}
+          onConfirm={confirmActionfunc}
           title="Confirm Action"
           message={confirmAction?.message}
           type="danger"

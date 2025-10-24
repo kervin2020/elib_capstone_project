@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 /** @type {import('tailwindcss').Config} */
 import tailwindcss from '@tailwindcss/vite'
 
@@ -32,6 +32,3 @@ export default {
     tailwindcss(),
   ],
 }
-=======
-import { defineConfig } from 'vite' import react from '@vitejs/plugin-react' // https://vite.dev/config/ export default defineConfig({ plugins: [ react({ babel: { plugins: [['babel-plugin-react-compiler']], }, }), ], })
->>>>>>> 21c107ffda62c0353e87f7b9d0fad26edb11c6ab

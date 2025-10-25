@@ -4,11 +4,11 @@ from config import db
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
 from datetime import timedelta
 
-# creation Blueprint pour route des utilisateur
+# Blueprint for user routes
 user_bp = Blueprint('user_bp', __name__)
 
 
-# fonction pour vérifier si l'utilisateur est admin
+# Check if user is admin
 def _require_admin(user_id=None):
     user = User.query.get(get_jwt_identity())
     if not user:
@@ -22,7 +22,7 @@ def _require_admin(user_id=None):
     return None
 
 
-# route pour creer un utilisateur
+# Create user
 @user_bp.route('/users', methods=['POST'])
 def create_user():
     data = request.get_json()
@@ -50,7 +50,7 @@ def create_user():
     }), 201
 
 
-# route pour afficher les utilisateur
+# Get all users
 @user_bp.route('/users', methods=['GET'])
 @jwt_required()
 def get_users():
@@ -70,7 +70,7 @@ def get_users():
     ]}), 200
 
 
-# route pour afficher un utilisateur
+# Get specific user
 @user_bp.route('/users/<int:user_id>', methods=['GET'])
 @jwt_required()
 def get_user(user_id):
@@ -88,7 +88,7 @@ def get_user(user_id):
     }), 200
 
 
-# route pour modifier un utilisateur
+# Update user
 @user_bp.route('/users/<int:user_id>', methods=['PUT'])
 @jwt_required()
 def update_user(user_id):
@@ -118,7 +118,7 @@ def update_user(user_id):
     }), 200
 
 
-# route pour supprimer un utilisateur
+# Delete user
 @user_bp.route('/users/<int:user_id>', methods=['DELETE'])
 @jwt_required()
 def delete_user(user_id):
@@ -133,7 +133,7 @@ def delete_user(user_id):
     return jsonify({"msg": "Utilisateur supprimé avec succès"}), 200
 
 
-# route pour récupérer l'utilisateur connecté
+# Get current user
 @user_bp.route('/users/me', methods=['GET'])
 @jwt_required()
 def get_current_user():
@@ -148,7 +148,7 @@ def get_current_user():
     }), 200
 
 
-# route pour connexion utilisateur
+# User login
 @user_bp.route('/login', methods=['POST'])
 def login():
     data = request.get_json()

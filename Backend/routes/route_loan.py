@@ -7,7 +7,7 @@ from datetime import datetime, timedelta
 loan_bp = Blueprint('loan_bp', __name__)
 
 
-# fonction pour vérifier si l'utilisateur est admin
+# Check if user is admin
 def _require_admin():
     user = User.query.get(get_jwt_identity())
     if not user or not user.is_admin:
@@ -15,7 +15,7 @@ def _require_admin():
     return None
 
 
-# route pour creer un emprunt
+# Create loan
 @loan_bp.route('/loans', methods=['POST'])
 @jwt_required()
 def create_loan():
@@ -53,7 +53,7 @@ def create_loan():
     }), 201
 
 
-# route pour afficher les prets d'utilisateurs
+# Get all loans
 @loan_bp.route('/loans', methods=['GET'])
 @jwt_required()
 def get_loans():
@@ -80,7 +80,7 @@ def get_loans():
     ]}), 200
 
 
-# route pour afficher un pret specifique
+# Get specific loan
 @loan_bp.route('/loans/<int:loan_id>', methods=['GET'])
 @jwt_required()
 def get_loan(loan_id):
@@ -102,7 +102,7 @@ def get_loan(loan_id):
     }), 200
 
 
-# route pour modifier un pret d utilisateur (retour)
+# Update loan (return)
 @loan_bp.route('/loans/<int:loan_id>', methods=['PUT'])
 @jwt_required()
 def update_loan(loan_id):
@@ -129,7 +129,7 @@ def update_loan(loan_id):
     }), 200
 
 
-# route pour récupérer les prêts d'un utilisateur spécifique
+# Get user loans
 @loan_bp.route('/users/<int:user_id>/loans', methods=['GET'])
 @jwt_required()
 def get_user_loans(user_id):
@@ -154,7 +154,7 @@ def get_user_loans(user_id):
     ]}), 200
 
 
-# route pour supprimer un pret
+# Delete loan
 @loan_bp.route('/loans/<int:loan_id>', methods=['DELETE'])
 @jwt_required()
 def delete_loan(loan_id):

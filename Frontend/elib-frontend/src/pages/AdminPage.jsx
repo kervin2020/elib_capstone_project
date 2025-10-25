@@ -107,7 +107,7 @@ const AdminPage = () => {
     setShowConfirmModal(true);
   };
 
-  const confirmAction = async () => {
+  const handleConfirmAction = async () => {
     if (!confirmAction) return;
 
     try {
@@ -468,7 +468,7 @@ const AdminPage = () => {
         <ConfirmModal
           isOpen={showConfirmModal}
           onClose={() => setShowConfirmModal(false)}
-          onConfirm={confirmAction}
+          onConfirm={handleConfirmAction}
           title="Confirm Action"
           message={confirmAction?.message}
           type="danger"

@@ -1,44 +1,13 @@
-import React, {
-  useState, useEffect
-}
-  from 'react';
-
-import {
-  useSearchParams
-}
-  from 'react-router-dom';
-
-import {
-  Search, Filter, Plus, Grid, List, Eye
-}
-  from 'lucide-react';
-
-import {
-  useAuth
-}
-  from '../contexts/AuthContext';
-
-import {
-  useBooks
-}
-  from '../contexts/BookContext';
-
-import {
-  useLoans
-}
-  from '../contexts/LoanContext';
-
-import {
-  useToast
-}
-  from '../contexts/ToastContext';
-
+import React, { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
+import { Search, Filter, Plus, Grid, List, Eye } from 'lucide-react';
+import { useAuth } from '../contexts/AuthContext';
+import { useBooks } from '../contexts/BookContext';
+import { useLoans } from '../contexts/LoanContext';
+import { useToast } from '../contexts/ToastContext';
 import BookCard from '../components/common/BookCard';
-
 import BookDetailModal from '../components/books/BookDetailModal';
-
 import AddBookModal from '../components/books/AddBookModal';
-
 import LoadingSpinner from '../components/common/LoadingSpinner';
 
 const BooksPage = () => {
@@ -99,7 +68,7 @@ const BooksPage = () => {
       const result = await createLoan(bookId);
       if (result.success) {
         success('Book borrowed successfully!');
-        fetchBooks(); // Refresh books to update availability
+        fetchBooks();
       } else {
         error(result.error || 'Failed to borrow book');
       }

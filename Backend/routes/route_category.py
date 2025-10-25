@@ -5,7 +5,7 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 category_bp = Blueprint('category_bp', __name__)
 
 
-# fonction pour vérifier si l'utilisateur est admin
+# Check if user is admin
 def _require_admin():
     user = User.query.get(get_jwt_identity())
     if not user or not user.is_admin:
@@ -13,7 +13,7 @@ def _require_admin():
     return None
 
 
-# Pour créer une nouvelle catégorie
+# Create new category
 @category_bp.route('/categories', methods=['POST'])
 @jwt_required()
 def create_category():
@@ -42,7 +42,7 @@ def create_category():
     }), 201
 
 
-# pour lister toutes les catégories
+# List all categories
 @category_bp.route('/categories', methods=['GET'])
 def get_categories():
     categories = Category.query.all()
@@ -55,7 +55,7 @@ def get_categories():
     ]}), 200
 
 
-# pour afficher une catégorie spécifique
+# Get specific category
 @category_bp.route('/categories/<int:category_id>', methods=['GET'])
 def get_category(category_id):
     category = Category.query.get_or_404(category_id)
@@ -66,7 +66,7 @@ def get_category(category_id):
     }), 200
 
 
-# Pour modiefier une catégorie
+# Update category
 @category_bp.route('/categories/<int:category_id>', methods=['PUT'])
 @jwt_required()
 def update_category(category_id):
@@ -91,7 +91,7 @@ def update_category(category_id):
     }), 200
 
 
-# route pour supprimmer une categorie
+# Delete category
 @category_bp.route('/categories/<int:category_id>', methods=['DELETE'])
 @jwt_required()
 def delete_category(category_id):

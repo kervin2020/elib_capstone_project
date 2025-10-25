@@ -7,3 +7,5 @@ flask_migrate
 email-validator
 flask-restx
 flask-swagger-ui
+flasgger
+

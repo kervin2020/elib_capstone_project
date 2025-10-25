@@ -1,3 +1,4 @@
+
 [[source]]
 url = "https://pypi.org/simple"
 verify_ssl = true
@@ -12,6 +13,8 @@ flask-bcrypt = "*"
 flask-migrate = "*"
 email-validator = "*"
 flask-restx = "*"
+flasgger = "*"
+
 
 [dev-packages]
 

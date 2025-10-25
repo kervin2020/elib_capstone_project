@@ -1,4 +1,10 @@
+<<<<<<< HEAD
 from flask import Flask, request
+=======
+from flask import Flask
+from flasgger import Swagger
+from swagger_config import swagger_template, swagger_config
+>>>>>>> e26e354 (the last)
 from config import db, jwt, migrate, cors, bcrypt
 from models import User, Ebook, Category, Loan
 
@@ -24,6 +30,7 @@ def create_app():
     migrate.init_app(app, db)
     bcrypt.init_app(app)
 
+<<<<<<< HEAD
     # Configure CORS properly - ONLY ONCE!
     cors.init_app(app, resources={
         r"/api/*": {
@@ -44,6 +51,13 @@ def create_app():
             response.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization'
             response.headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, DELETE, OPTIONS, PATCH'
         return response
+=======
+    # initialisation Swagger
+    from flasgger import Swagger
+    Swagger(app, config=swagger_config, template=swagger_template)
+
+
+>>>>>>> e26e354 (the last)
 
     #  route d'accueil
     @app.route('/')

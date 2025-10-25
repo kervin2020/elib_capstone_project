@@ -9,6 +9,16 @@ loan_bp = Blueprint('loan_bp', __name__)
 
 # Check if user is admin
 def _require_admin():
+    """
+    Vérifie si l'utilisateur est administrateur
+    securite:
+        -jwt:[]
+        response:
+        200:
+            description: Accès autorisé
+            403:
+            description: Accès interdit, vous n'êtes pas administrateur
+    """
     user = User.query.get(get_jwt_identity())
     if not user or not user.is_admin:
         return jsonify({"msg": "Accès interdit, vous n'êtes pas administrateur"}), 403
@@ -19,6 +29,31 @@ def _require_admin():
 @loan_bp.route('/loans', methods=['POST'])
 @jwt_required()
 def create_loan():
+    """
+    creer un nouvel emprunt
+
+    tags:
+      - loans
+    security:
+      - jwt: []
+    parameters:
+      - in: body
+        name: loan
+        schema:
+            type: object
+            properties:
+              ebook_id:
+                type: integer
+            required:
+              - ebook_id
+    responses:
+        201:
+            description: Emprunt créé avec succès
+        400:
+            description: L'identifiant du livre est requis / Aucune copie disponible pour ce livre  
+
+    
+    """
     data = request.get_json()
     user_id = get_jwt_identity()
 
@@ -57,6 +92,15 @@ def create_loan():
 @loan_bp.route('/loans', methods=['GET'])
 @jwt_required()
 def get_loans():
+    """
+    Récupérer tous les prêts
+
+    tags:
+        - loans
+    responses:
+        200:
+            description: Liste des prêts récupérés
+    """ 
     user_id = get_jwt_identity()
     user = User.query.get(user_id)
 
@@ -84,6 +128,21 @@ def get_loans():
 @loan_bp.route('/loans/<int:loan_id>', methods=['GET'])
 @jwt_required()
 def get_loan(loan_id):
+    """
+    Récupérer un prêt par son ID
+
+    tags:
+        - loans 
+    parameters:
+        - in: path
+          name: loan_id
+          required: true
+          schema:
+            type: integer
+    responses:
+        200:
+            description: prêt récupéré
+    """
     loan = Loan.query.get_or_404(loan_id)
     user_id = get_jwt_identity()
     user = User.query.get(user_id)
@@ -106,6 +165,27 @@ def get_loan(loan_id):
 @loan_bp.route('/loans/<int:loan_id>', methods=['PUT'])
 @jwt_required()
 def update_loan(loan_id):
+    """
+    retourner un prêt
+
+    tags:
+        - loans
+        security:
+          - jwt: []
+            parameters:
+              - in: path
+                name: loan_id
+                required: true
+                schema:
+                  type: integer
+            responses:
+                200:
+                    description: prêt retourné avec succès
+                403:
+                    description: Accès interdit, vous n'êtes pas propriétaire de ce prêt
+                400:
+                    description: Ce prêt a déjà été retourné
+    """
     loan = Loan.query.get_or_404(loan_id)
 
     if loan.user_id != get_jwt_identity():
@@ -133,6 +213,21 @@ def update_loan(loan_id):
 @loan_bp.route('/users/<int:user_id>/loans', methods=['GET'])
 @jwt_required()
 def get_user_loans(user_id):
+    """
+    Récupérer les prêts d'un utilisateur
+    
+    tags:
+        - loans
+    parameters:
+        - in: path
+          name: user_id
+          required: true
+          schema:
+            type: integer
+    responses:
+        200:
+            description: Liste des prêts de l'utilisateur récupérée
+    """
     current_user_id = get_jwt_identity()
     current_user = User.query.get(current_user_id)
 
@@ -158,6 +253,23 @@ def get_user_loans(user_id):
 @loan_bp.route('/loans/<int:loan_id>', methods=['DELETE'])
 @jwt_required()
 def delete_loan(loan_id):
+    """
+    Supprimer un prêt
+
+    tags:
+        - loans
+
+        parameters:
+        - in: path
+          name: loan_id
+          required: true
+          schema:
+            type: integer
+            responses:
+                200:
+                    description: prêt supprimé avec succès
+
+    """
     err = _require_admin()
     if err:
         return err

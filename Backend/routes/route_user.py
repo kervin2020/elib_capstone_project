@@ -10,6 +10,17 @@ user_bp = Blueprint('user_bp', __name__)
 
 # Check if user is admin
 def _require_admin(user_id=None):
+    """
+    Vérifie si l'utilisateur est administrateur.
+
+    securite:
+    - Si user_id est None, vérifie si l'utilisateur actuel est admin.
+      jwt: [ ]
+      response: 403 
+       description: Accès interdit, vous n'êtes pas administrateur
+      response: 200
+        description: Accès autorisé
+    """
     user = User.query.get(get_jwt_identity())
     if not user:
         return jsonify({"msg": "Utilisateur non trouvé"}), 404
@@ -25,6 +36,36 @@ def _require_admin(user_id=None):
 # Create user
 @user_bp.route('/users', methods=['POST'])
 def create_user():
+    """ 
+     creer une nouvelle utilisateur
+
+     tag:
+       - users
+    parameter:
+        - in: body
+          name: user
+          schema:
+            type: object
+            properties:
+              username:
+                type: string
+              email:
+                type: string
+              password:
+                type: string
+              is_admin:
+                type: boolean
+            required:
+              - username
+              - email
+              - password
+    responses:
+        201:
+            description: Utilisateur creer avec succes
+        400:
+            description: Donnees invalides
+
+    """
     data = request.get_json()
 
     if not data.get('username') or not data.get('email') or not data.get('password'):
@@ -54,6 +95,20 @@ def create_user():
 @user_bp.route('/users', methods=['GET'])
 @jwt_required()
 def get_users():
+    """ 
+    liste tous les utilisateurs (administrateur requis)
+
+    tags:
+        - users
+    securite:
+        - jwt: [ ]
+    responses:
+        200:
+            description: Liste des utilisateurs
+        403:
+            description: Accès interdit, vous n'êtes pas administrateur
+    
+    """
     err = _require_admin()
     if err:
         return err
@@ -74,6 +129,20 @@ def get_users():
 @user_bp.route('/users/<int:user_id>', methods=['GET'])
 @jwt_required()
 def get_user(user_id):
+    """ 
+    afficher un utilisateur specifique (administrateur ou proprietaire requis)
+
+    tags:
+        - users
+    securite:
+        - jwt: [ ]
+    responses:
+        200:
+            description: Détails de l'utilisateur
+        403:
+            description: Accès interdit, vous n'êtes pas administrateur ou propriétaire du compte
+    
+    """
     err = _require_admin(user_id)
     if err:
         return err
@@ -122,6 +191,20 @@ def update_user(user_id):
 @user_bp.route('/users/<int:user_id>', methods=['DELETE'])
 @jwt_required()
 def delete_user(user_id):
+    """
+    suprimmer un tilisateur (administrateur ou proprietaire requis)
+
+    tags:
+        - users
+        securite:
+        - jwt: [ ]
+    responses:
+        200:
+            description: Utilisateur supprimé avec succès
+        403:
+            description: Accès interdit, vous n'êtes pas administrateur ou propriétaire du compte
+    
+    """
     err = _require_admin(user_id)
     if err:
         return err
@@ -137,6 +220,18 @@ def delete_user(user_id):
 @user_bp.route('/users/me', methods=['GET'])
 @jwt_required()
 def get_current_user():
+    """
+    récupérer l'utilisateur connecté
+
+    tags:
+         -users
+    securite:
+        - jwt: [ ]
+    responses:
+        200:
+            description: Détails de l'utilisateur connecté   
+
+    """
     user_id = get_jwt_identity()
     user = User.query.get_or_404(user_id)
     return jsonify({
@@ -151,6 +246,32 @@ def get_current_user():
 # User login
 @user_bp.route('/login', methods=['POST'])
 def login():
+    """
+    connexion utilisateur
+
+     tags:
+        - users
+    parameter:
+        - in: body
+          name: credentials
+          schema:
+            type: object
+            properties:
+              email:
+                type: string
+                password:
+                type: string
+            required:
+              - email
+              - password
+    responses:
+        200:
+            description: Connexion réussie
+        400:
+            description: Email et mot de passe sont requis
+        401:
+            description: Email ou mot de passe incorrect
+    """
     data = request.get_json()
 
     if not data.get('email') or not data.get('password'):

@@ -12,9 +12,14 @@ flask-cors = "*"
 flask-bcrypt = "*"
 flask-migrate = "*"
 email-validator = "*"
+<<<<<<< HEAD
 flask-restx = "*"
 flasgger = "*"
 
+=======
+flasgger = "*"
+flask-restx = "*"
+>>>>>>> a633cb2 (add swagger)
 
 [dev-packages]
 

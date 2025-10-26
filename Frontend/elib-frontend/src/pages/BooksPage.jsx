@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Search, Filter, Plus, Grid, List, Eye } from 'lucide-react';
+import { Search, Filter, Plus, Grid, List, Eye, BookOpen } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useBooks } from '../contexts/BookContext';
 import { useLoans } from '../contexts/LoanContext';

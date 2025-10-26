@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useReducer, useEffect } from 'react';
+import React, { createContext, useContext, useReducer, useEffect, useCallback } from 'react';
 import axios from 'axios';
 
 // État initial
@@ -73,13 +73,8 @@ const LoanContext = createContext();
 export const LoanProvider = ({ children }) => {
   const [state, dispatch] = useReducer(loanReducer, initialState);
 
-  // Charger les emprunts au montage du composant
-  useEffect(() => {
-    fetchLoans();
-  }, []);
-
   // Fonction pour récupérer tous les emprunts
-  const fetchLoans = async () => {
+  const fetchLoans = useCallback(async () => {
     dispatch({ type: LOAN_ACTIONS.SET_LOADING, payload: true });
     try {
       const response = await axios.get('/loans');
@@ -87,10 +82,10 @@ export const LoanProvider = ({ children }) => {
     } catch (error) {
       dispatch({ type: LOAN_ACTIONS.SET_ERROR, payload: error.response?.data?.msg || 'Erreur lors du chargement des emprunts' });
     }
-  };
+  }, []);
 
   // Fonction pour récupérer un emprunt spécifique
-  const fetchLoan = async (loanId) => {
+  const fetchLoan = useCallback(async (loanId) => {
     dispatch({ type: LOAN_ACTIONS.SET_LOADING, payload: true });
     try {
       const response = await axios.get(`/loans/${loanId}`);
@@ -98,10 +93,10 @@ export const LoanProvider = ({ children }) => {
     } catch (error) {
       dispatch({ type: LOAN_ACTIONS.SET_ERROR, payload: error.response?.data?.msg || 'Erreur lors du chargement de l\'emprunt' });
     }
-  };
+  }, []);
 
   // Fonction pour créer un emprunt
-  const createLoan = async (ebookId) => {
+  const createLoan = useCallback(async (ebookId) => {
     dispatch({ type: LOAN_ACTIONS.SET_LOADING, payload: true });
     try {
       const response = await axios.post('/loans', { ebook_id: ebookId });
@@ -112,10 +107,10 @@ export const LoanProvider = ({ children }) => {
       dispatch({ type: LOAN_ACTIONS.SET_ERROR, payload: errorMessage });
       return { success: false, error: errorMessage };
     }
-  };
+  }, []);
 
   // Fonction pour retourner un livre
-  const returnBook = async (loanId) => {
+  const returnBook = useCallback(async (loanId) => {
     dispatch({ type: LOAN_ACTIONS.SET_LOADING, payload: true });
     try {
       const response = await axios.put(`/loans/${loanId}`);
@@ -126,10 +121,10 @@ export const LoanProvider = ({ children }) => {
       dispatch({ type: LOAN_ACTIONS.SET_ERROR, payload: errorMessage });
       return { success: false, error: errorMessage };
     }
-  };
+  }, []);
 
   // Fonction pour supprimer un emprunt (admin)
-  const deleteLoan = async (loanId) => {
+  const deleteLoan = useCallback(async (loanId) => {
     dispatch({ type: LOAN_ACTIONS.SET_LOADING, payload: true });
     try {
       await axios.delete(`/loans/${loanId}`);
@@ -140,43 +135,46 @@ export const LoanProvider = ({ children }) => {
       dispatch({ type: LOAN_ACTIONS.SET_ERROR, payload: errorMessage });
       return { success: false, error: errorMessage };
     }
-  };
+  }, []);
 
   // Fonction pour effacer les erreurs
-  const clearError = () => {
+  const clearError = useCallback(() => {
     dispatch({ type: LOAN_ACTIONS.CLEAR_ERROR });
-  };
+  }, []);
 
   // Fonction pour obtenir les emprunts actifs d'un utilisateur
-  const getUserActiveLoans = (userId) => {
+  const getUserActiveLoans = useCallback((userId) => {
     return state.loans.filter(loan => loan.user_id === userId && !loan.is_returned);
-  };
+  }, [state.loans]);
 
   // Fonction pour obtenir l'historique des emprunts d'un utilisateur
-  const getUserLoanHistory = (userId) => {
+  const getUserLoanHistory = useCallback((userId) => {
     return state.loans.filter(loan => loan.user_id === userId);
-  };
+  }, [state.loans]);
 
   // Fonction pour obtenir les emprunts en retard
-  const getOverdueLoans = () => {
+  const getOverdueLoans = useCallback(() => {
     const now = new Date();
-    return state.loans.filter(loan => 
+    return state.loans.filter(loan =>
       !loan.is_returned && new Date(loan.due_date) < now
     );
-  };
+  }, [state.loans]);
 
   // Fonction pour vérifier si un livre est emprunté par un utilisateur
-  const isBookLoanedByUser = (bookId, userId) => {
-    return state.loans.some(loan => 
+  const isBookLoanedByUser = useCallback((bookId, userId) => {
+    return state.loans.some(loan =>
       loan.ebook_id === bookId && loan.user_id === userId && !loan.is_returned
     );
-  };
+  }, [state.loans]);
 
   // Calculer les statistiques
-  const calculateStats = () => {
+  const calculateStats = useCallback(() => {
     const totalLoans = state.loans.length;
     const activeLoans = state.loans.filter(loan => !loan.is_returned).length;
-    const overdueLoans = getOverdueLoans().length;
+    const now = new Date();
+    const overdueLoans = state.loans.filter(loan =>
+      !loan.is_returned && new Date(loan.due_date) < now
+    ).length;
     const returnedLoans = state.loans.filter(loan => loan.is_returned).length;
 
     dispatch({
@@ -188,12 +186,17 @@ export const LoanProvider = ({ children }) => {
         returnedLoans
       }
     });
-  };
+  }, [state.loans]);
+
+  // Charger les emprunts au montage du composant (une seule fois)
+  useEffect(() => {
+    fetchLoans();
+  }, [fetchLoans]);
 
   // Recalculer les stats quand les emprunts changent
   useEffect(() => {
     calculateStats();
-  }, [state.loans]);
+  }, [calculateStats]);
 
   const value = {
     ...state,

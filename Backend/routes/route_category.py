@@ -7,6 +7,16 @@ category_bp = Blueprint('category_bp', __name__)
 
 # Check if user is admin
 def _require_admin():
+    """
+    verifie si l'utilisateur est administrateur
+    securite:
+        -jwt:[]
+    response:
+        200:
+            description: Accès autorisé
+        403:
+            description: Accès interdit, vous n'êtes pas administrateur
+    """
     user = User.query.get(get_jwt_identity())
     if not user or not user.is_admin:
         return jsonify({"msg": "Accès interdit, vous n'êtes pas administrateur"}), 403
@@ -17,6 +27,33 @@ def _require_admin():
 @category_bp.route('/categories', methods=['POST'])
 @jwt_required()
 def create_category():
+    """
+    creer une nouvelle catégorie
+    
+      tags:
+        - categories
+        security:
+          - jwt: []
+        parameters:
+          - in: body
+            name: category
+            schema:
+                type: object
+                properties:
+                    name:
+                    type: string
+                    description:
+                    type: string
+                required:
+                    - name
+        responses:
+            201:
+                description: Catégorie créée
+            400:
+                description: Le nom de la catégorie est requis
+            403:
+                description: Accès interdit, vous n'êtes pas administrateur
+    """
     err = _require_admin()
     if err:
         return err
@@ -45,6 +82,17 @@ def create_category():
 # List all categories
 @category_bp.route('/categories', methods=['GET'])
 def get_categories():
+    """
+    Récupérer toutes les catégories
+
+    tags:
+        - categories
+    responses:
+        200:
+            description: Liste des catégories récupérées
+        404:
+            description: Aucune catégorie trouvée
+    """
     categories = Category.query.all()
     return jsonify({'categories': [
         {
@@ -58,6 +106,23 @@ def get_categories():
 # Get specific category
 @category_bp.route('/categories/<int:category_id>', methods=['GET'])
 def get_category(category_id):
+    """
+    Récupérer une catégorie par son ID
+    
+    tags:
+        - categories
+    parameters:
+        - in: path
+          name: category_id
+          required: true
+          schema:
+            type: integer
+    responses:
+        200:
+            description: Catégorie récupérée
+        404:
+            description: Catégorie non trouvée
+    """
     category = Category.query.get_or_404(category_id)
     return jsonify({
         'id': category.id,
@@ -70,6 +135,23 @@ def get_category(category_id):
 @category_bp.route('/categories/<int:category_id>', methods=['PUT'])
 @jwt_required()
 def update_category(category_id):
+    """
+    Mettre à jour une catégorie par son ID
+
+    tags:
+        - categories
+    parameters:
+        - in: path
+          name: category_id
+          required: true
+          schema:
+            type: integer
+    responses:
+        200:
+            description: Catégorie mise à jour
+        404:
+            description: Catégorie non trouvée
+    """
     err = _require_admin()
     if err:
         return err
@@ -95,6 +177,21 @@ def update_category(category_id):
 @category_bp.route('/categories/<int:category_id>', methods=['DELETE'])
 @jwt_required()
 def delete_category(category_id):
+    """
+    Supprimer une catégorie par son ID
+
+    tags:
+        - categories
+    parameters:
+        - in: path
+          name: category_id
+          required: true
+          schema:
+            type: integer
+    responses:
+        200:
+            description: Catégorie supprimée
+    """
     err = _require_admin()
     if err:
         return err

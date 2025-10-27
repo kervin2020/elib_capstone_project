@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useReducer, useEffect } from 'react';
+import React, { createContext, useContext, useReducer, useCallback } from 'react';
 import axios from 'axios';
 
 // État initial
@@ -89,7 +89,7 @@ export const AdminProvider = ({ children }) => {
   const [state, dispatch] = useReducer(adminReducer, initialState);
 
   // Fonction pour récupérer tous les utilisateurs
-  const fetchUsers = async () => {
+  const fetchUsers = useCallback(async () => {
     dispatch({ type: ADMIN_ACTIONS.SET_LOADING, payload: true });
     try {
       const response = await axios.get('/users');
@@ -97,20 +97,20 @@ export const AdminProvider = ({ children }) => {
     } catch (error) {
       dispatch({ type: ADMIN_ACTIONS.SET_ERROR, payload: error.response?.data?.msg || 'Erreur lors du chargement des utilisateurs' });
     }
-  };
+  }, []);
 
   // Fonction pour récupérer toutes les catégories
-  const fetchCategories = async () => {
+  const fetchCategories = useCallback(async () => {
     try {
       const response = await axios.get('/categories');
       dispatch({ type: ADMIN_ACTIONS.FETCH_CATEGORIES_SUCCESS, payload: response.data.categories });
     } catch (error) {
       // Error loading categories
     }
-  };
+  }, []);
 
   // Fonction pour mettre à jour un utilisateur
-  const updateUser = async (userId, userData) => {
+  const updateUser = useCallback(async (userId, userData) => {
     dispatch({ type: ADMIN_ACTIONS.SET_LOADING, payload: true });
     try {
       const response = await axios.put(`/users/${userId}`, userData);
@@ -121,10 +121,10 @@ export const AdminProvider = ({ children }) => {
       dispatch({ type: ADMIN_ACTIONS.SET_ERROR, payload: errorMessage });
       return { success: false, error: errorMessage };
     }
-  };
+  }, []);
 
   // Fonction pour supprimer un utilisateur
-  const deleteUser = async (userId) => {
+  const deleteUser = useCallback(async (userId) => {
     dispatch({ type: ADMIN_ACTIONS.SET_LOADING, payload: true });
     try {
       await axios.delete(`/users/${userId}`);
@@ -135,15 +135,15 @@ export const AdminProvider = ({ children }) => {
       dispatch({ type: ADMIN_ACTIONS.SET_ERROR, payload: errorMessage });
       return { success: false, error: errorMessage };
     }
-  };
+  }, []);
 
   // Fonction pour bannir/débannir un utilisateur
-  const toggleUserBan = async (userId, isBanned) => {
+  const toggleUserBan = useCallback(async (userId, isBanned) => {
     return updateUser(userId, { is_banned: isBanned });
-  };
+  }, [updateUser]);
 
   // Fonction pour ajouter une catégorie
-  const addCategory = async (categoryData) => {
+  const addCategory = useCallback(async (categoryData) => {
     dispatch({ type: ADMIN_ACTIONS.SET_LOADING, payload: true });
     try {
       const response = await axios.post('/categories', categoryData);
@@ -154,10 +154,10 @@ export const AdminProvider = ({ children }) => {
       dispatch({ type: ADMIN_ACTIONS.SET_ERROR, payload: errorMessage });
       return { success: false, error: errorMessage };
     }
-  };
+  }, []);
 
   // Fonction pour mettre à jour une catégorie
-  const updateCategory = async (categoryId, categoryData) => {
+  const updateCategory = useCallback(async (categoryId, categoryData) => {
     dispatch({ type: ADMIN_ACTIONS.SET_LOADING, payload: true });
     try {
       const response = await axios.put(`/categories/${categoryId}`, categoryData);
@@ -168,10 +168,10 @@ export const AdminProvider = ({ children }) => {
       dispatch({ type: ADMIN_ACTIONS.SET_ERROR, payload: errorMessage });
       return { success: false, error: errorMessage };
     }
-  };
+  }, []);
 
   // Fonction pour supprimer une catégorie
-  const deleteCategory = async (categoryId) => {
+  const deleteCategory = useCallback(async (categoryId) => {
     dispatch({ type: ADMIN_ACTIONS.SET_LOADING, payload: true });
     try {
       await axios.delete(`/categories/${categoryId}`);
@@ -182,10 +182,10 @@ export const AdminProvider = ({ children }) => {
       dispatch({ type: ADMIN_ACTIONS.SET_ERROR, payload: errorMessage });
       return { success: false, error: errorMessage };
     }
-  };
+  }, []);
 
   // Fonction pour récupérer les statistiques
-  const fetchStats = async () => {
+  const fetchStats = useCallback(async () => {
     try {
       // Fetch statistics from API
       // Calculate statistics from existing data
@@ -208,12 +208,12 @@ export const AdminProvider = ({ children }) => {
     } catch (error) {
       // Error loading statistics
     }
-  };
+  }, [state.users.length]);
 
   // Fonction pour effacer les erreurs
-  const clearError = () => {
+  const clearError = useCallback(() => {
     dispatch({ type: ADMIN_ACTIONS.CLEAR_ERROR });
-  };
+  }, []);
 
   const value = {
     ...state,

@@ -167,9 +167,8 @@ const RegisterForm = () => {
                   required
                   value={formData.confirmPassword}
                   onChange={handleChange}
-                  className={`input-field pl-10 pr-10 ${
-                    formData.confirmPassword && !isPasswordMatch ? 'border-red-300 focus:ring-red-500 focus:border-red-500' : ''
-                  }`}
+                  className={`input-field pl-10 pr-10 ${formData.confirmPassword && !isPasswordMatch ? 'border-red-300 focus:ring-red-500 focus:border-red-500' : ''
+                    }`}
                   placeholder="Confirm your password"
                 />
                 <button
@@ -202,7 +201,7 @@ const RegisterForm = () => {
             <button
               type="submit"
               disabled={isLoading || !isFormValid}
-              className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-primary-900 hover:bg-primary-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+              className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-black bg-primary-900 hover:bg-primary-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
             >
               {isLoading ? (
                 <div className="flex items-center space-x-2">

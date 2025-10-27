@@ -8,7 +8,7 @@ import LoadingSpinner from '../common/LoadingSpinner';
 const AddBookModal = ({ isOpen, onClose }) => {
   const { addBook, categories } = useBooks();
   const { success, error } = useToast();
-  
+
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     title: '',
@@ -55,7 +55,7 @@ const AddBookModal = ({ isOpen, onClose }) => {
       error('Title and author are required');
       return;
     }
-    
+
     setIsLoading(true);
     try {
       const result = await addBook(formData);

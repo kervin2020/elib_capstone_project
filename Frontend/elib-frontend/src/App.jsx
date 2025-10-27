@@ -24,22 +24,22 @@ import { useToast } from './contexts/ToastContext';
 // Protected Route Component 
 const ProtectedRoute = ({ children, requireAdmin = false }) => {
     const { isAuthenticated, user } = useAuth();
-    
+
     if (!isAuthenticated) {
-        return <Navigate to="/login" replace />;
+        return <Navigate to="/" replace />;
     }
-    
+
     if (requireAdmin && !user?.is_admin) {
         return <Navigate to="/" replace />;
     }
-    
+
     return children;
 };
 
 // Layout Component 
 const Layout = ({ children }) => {
     const { toasts, removeToast } = useToast();
-    
+
     return (
         <div className="min-h-screen flex flex-col">
             <Header />
@@ -69,7 +69,7 @@ const AppRoutes = () => {
             } />
             <Route path="/login" element={<LoginForm />} />
             <Route path="/register" element={<RegisterForm />} />
-            
+
             {/* Protected Routes */}
             <Route path="/loans" element={
                 <ProtectedRoute>
@@ -85,7 +85,7 @@ const AppRoutes = () => {
                     </Layout>
                 </ProtectedRoute>
             } />
-            
+
             {/* Catch all route */}
             <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>

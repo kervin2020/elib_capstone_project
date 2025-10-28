@@ -186,7 +186,7 @@ const AdminPage = () => {
               </h2>
               <button
                 onClick={() => setShowAddBookModal(true)}
-                className="flex items-center justify-center gap-2 bg-primary-600 text-white px-3 py-2 rounded-md hover:bg-primary-700 text-sm sm:text-base"
+                className="flex items-center justify-center gap-2 bg-blue-600 text-white px-3 py-2 rounded-md hover:bg-blue-700 text-sm sm:text-base"
               >
                 <PlusCircle className="w-4 h-4" />
                 Ajouter un livre
@@ -282,7 +282,7 @@ const AdminPage = () => {
               </h2>
               <button
                 onClick={() => setShowAddCategoryModal(true)}
-                className="flex items-center justify-center gap-2 bg-primary-600 text-white px-3 py-2 rounded-md hover:bg-primary-700 text-sm sm:text-base"
+                className="flex items-center justify-center gap-2 bg-blue-600 text-white px-3 py-2 rounded-md hover:bg-blue-700 text-sm sm:text-base"
               >
                 <PlusCircle className="w-4 h-4" />
                 Ajouter une catégorie

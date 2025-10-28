@@ -60,8 +60,9 @@ class Ebook(db.Model):
     title = db.Column(db.String(40))
     author = db.Column(db.String(70))
     description = db.Column(db.Text)
+    cover_image = db.Column(db.String(200), nullable=True)
     # chemin du fichier ebook
-    file_path = db.Column(db.String(200), nullable=False)
+    file_path = db.Column(db.String(200), nullable=True)
     # nomvre total d'exemplaire
     total_copies = db.Column(db.Integer, default=1)
     # nombre d'exemplaire disponible
@@ -69,7 +70,8 @@ class Ebook(db.Model):
     uploaded_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     categories = db.relationship('Category', secondary=ebook_category,
-                                 backref=db.backref('ebooks', lazy='dynamic'))  # relation many to many entre ebook et category
+                                 # relation many to many entre ebook et category
+                                 backref=db.backref('ebooks', lazy='dynamic'))
     # relation one to many entre ebook et loan
     loans = db.relationship('Loan', back_populates='ebook', lazy=True)
 

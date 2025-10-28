@@ -1,7 +1,16 @@
 import React, { createContext, useContext, useReducer, useCallback } from 'react';
-import axios from 'axios';
+import {
+  getUsers,
+  updateUser as updateUserApi,
+  deleteUser as deleteUserApi,
+} from '../api/userApi';
+import {
+  getCategories,
+  createCategory,
+  updateCategory as updateCategoryApi,
+  deleteCategory as deleteCategoryApi,
+} from '../api/categoryApi';
 
-// État initial
 const initialState = {
   users: [],
   categories: [],
@@ -10,13 +19,12 @@ const initialState = {
     totalBooks: 0,
     totalLoans: 0,
     activeLoans: 0,
-    overdueLoans: 0
+    overdueLoans: 0,
   },
   isLoading: false,
-  error: null
+  error: null,
 };
 
-// Types d'actions
 const ADMIN_ACTIONS = {
   SET_LOADING: 'SET_LOADING',
   SET_ERROR: 'SET_ERROR',
@@ -28,10 +36,9 @@ const ADMIN_ACTIONS = {
   ADD_CATEGORY_SUCCESS: 'ADD_CATEGORY_SUCCESS',
   UPDATE_CATEGORY_SUCCESS: 'UPDATE_CATEGORY_SUCCESS',
   DELETE_CATEGORY_SUCCESS: 'DELETE_CATEGORY_SUCCESS',
-  SET_STATS: 'SET_STATS'
+  SET_STATS: 'SET_STATS',
 };
 
-// Reducer pour gérer l'état d'administration
 const adminReducer = (state, action) => {
   switch (action.type) {
     case ADMIN_ACTIONS.SET_LOADING:
@@ -47,32 +54,41 @@ const adminReducer = (state, action) => {
     case ADMIN_ACTIONS.UPDATE_USER_SUCCESS:
       return {
         ...state,
-        users: state.users.map(user => user.id === action.payload.id ? action.payload : user),
+        users: state.users.map((user) =>
+          user.id === action.payload.id ? action.payload : user
+        ),
         isLoading: false,
-        error: null
+        error: null,
       };
     case ADMIN_ACTIONS.DELETE_USER_SUCCESS:
       return {
         ...state,
-        users: state.users.filter(user => user.id !== action.payload),
+        users: state.users.filter((user) => user.id !== action.payload),
         isLoading: false,
-        error: null
+        error: null,
       };
     case ADMIN_ACTIONS.ADD_CATEGORY_SUCCESS:
-      return { ...state, categories: [...state.categories, action.payload], isLoading: false, error: null };
+      return {
+        ...state,
+        categories: [...state.categories, action.payload],
+        isLoading: false,
+        error: null,
+      };
     case ADMIN_ACTIONS.UPDATE_CATEGORY_SUCCESS:
       return {
         ...state,
-        categories: state.categories.map(cat => cat.id === action.payload.id ? action.payload : cat),
+        categories: state.categories.map((cat) =>
+          cat.id === action.payload.id ? action.payload : cat
+        ),
         isLoading: false,
-        error: null
+        error: null,
       };
     case ADMIN_ACTIONS.DELETE_CATEGORY_SUCCESS:
       return {
         ...state,
-        categories: state.categories.filter(cat => cat.id !== action.payload),
+        categories: state.categories.filter((cat) => cat.id !== action.payload),
         isLoading: false,
-        error: null
+        error: null,
       };
     case ADMIN_ACTIONS.SET_STATS:
       return { ...state, stats: action.payload };
@@ -81,136 +97,158 @@ const adminReducer = (state, action) => {
   }
 };
 
-// Création du contexte
 const AdminContext = createContext();
 
-// Provider du contexte d'administration
 export const AdminProvider = ({ children }) => {
   const [state, dispatch] = useReducer(adminReducer, initialState);
 
-  // Fonction pour récupérer tous les utilisateurs
   const fetchUsers = useCallback(async () => {
     dispatch({ type: ADMIN_ACTIONS.SET_LOADING, payload: true });
     try {
-      const response = await axios.get('/users');
-      dispatch({ type: ADMIN_ACTIONS.FETCH_USERS_SUCCESS, payload: response.data.users });
+      const response = await getUsers();
+      dispatch({
+        type: ADMIN_ACTIONS.FETCH_USERS_SUCCESS,
+        payload: response.data.users || response.data,
+      });
     } catch (error) {
-      dispatch({ type: ADMIN_ACTIONS.SET_ERROR, payload: error.response?.data?.msg || 'Erreur lors du chargement des utilisateurs' });
+      dispatch({
+        type: ADMIN_ACTIONS.SET_ERROR,
+        payload:
+          error.response?.data?.msg ||
+          'Erreur lors du chargement des utilisateurs',
+      });
     }
   }, []);
 
-  // Fonction pour récupérer toutes les catégories
   const fetchCategories = useCallback(async () => {
+    dispatch({ type: ADMIN_ACTIONS.SET_LOADING, payload: true });
     try {
-      const response = await axios.get('/categories');
-      dispatch({ type: ADMIN_ACTIONS.FETCH_CATEGORIES_SUCCESS, payload: response.data.categories });
+      const response = await getCategories();
+      dispatch({
+        type: ADMIN_ACTIONS.FETCH_CATEGORIES_SUCCESS,
+        payload: response.data.categories || response.data,
+      });
     } catch (error) {
-      // Error loading categories
+      dispatch({
+        type: ADMIN_ACTIONS.SET_ERROR,
+        payload:
+          error.response?.data?.msg ||
+          'Erreur lors du chargement des catégories',
+      });
     }
   }, []);
 
-  // Fonction pour mettre à jour un utilisateur
   const updateUser = useCallback(async (userId, userData) => {
     dispatch({ type: ADMIN_ACTIONS.SET_LOADING, payload: true });
     try {
-      const response = await axios.put(`/users/${userId}`, userData);
-      dispatch({ type: ADMIN_ACTIONS.UPDATE_USER_SUCCESS, payload: response.data.user });
+      const response = await updateUserApi(userId, userData);
+      dispatch({
+        type: ADMIN_ACTIONS.UPDATE_USER_SUCCESS,
+        payload: response.data.user || response.data,
+      });
       return { success: true };
     } catch (error) {
-      const errorMessage = error.response?.data?.msg || 'Erreur lors de la mise à jour de l\'utilisateur';
+      const errorMessage =
+        error.response?.data?.msg ||
+        "Erreur lors de la mise à jour de l'utilisateur";
       dispatch({ type: ADMIN_ACTIONS.SET_ERROR, payload: errorMessage });
       return { success: false, error: errorMessage };
     }
   }, []);
 
-  // Fonction pour supprimer un utilisateur
   const deleteUser = useCallback(async (userId) => {
     dispatch({ type: ADMIN_ACTIONS.SET_LOADING, payload: true });
     try {
-      await axios.delete(`/users/${userId}`);
+      await deleteUserApi(userId);
       dispatch({ type: ADMIN_ACTIONS.DELETE_USER_SUCCESS, payload: userId });
       return { success: true };
     } catch (error) {
-      const errorMessage = error.response?.data?.msg || 'Erreur lors de la suppression de l\'utilisateur';
+      const errorMessage =
+        error.response?.data?.msg ||
+        "Erreur lors de la suppression de l'utilisateur";
       dispatch({ type: ADMIN_ACTIONS.SET_ERROR, payload: errorMessage });
       return { success: false, error: errorMessage };
     }
   }, []);
 
-  // Fonction pour bannir/débannir un utilisateur
-  const toggleUserBan = useCallback(async (userId, isBanned) => {
-    return updateUser(userId, { is_banned: isBanned });
-  }, [updateUser]);
+  const toggleUserBan = useCallback(
+    async (userId, isBanned) => updateUser(userId, { is_banned: isBanned }),
+    [updateUser]
+  );
 
-  // Fonction pour ajouter une catégorie
   const addCategory = useCallback(async (categoryData) => {
     dispatch({ type: ADMIN_ACTIONS.SET_LOADING, payload: true });
     try {
-      const response = await axios.post('/categories', categoryData);
-      dispatch({ type: ADMIN_ACTIONS.ADD_CATEGORY_SUCCESS, payload: response.data.category });
+      const response = await createCategory(categoryData);
+      dispatch({
+        type: ADMIN_ACTIONS.ADD_CATEGORY_SUCCESS,
+        payload: response.data.category || response.data,
+      });
       return { success: true };
     } catch (error) {
-      const errorMessage = error.response?.data?.msg || 'Erreur lors de l\'ajout de la catégorie';
+      const errorMessage =
+        error.response?.data?.msg ||
+        "Erreur lors de l'ajout de la catégorie";
       dispatch({ type: ADMIN_ACTIONS.SET_ERROR, payload: errorMessage });
       return { success: false, error: errorMessage };
     }
   }, []);
 
-  // Fonction pour mettre à jour une catégorie
   const updateCategory = useCallback(async (categoryId, categoryData) => {
     dispatch({ type: ADMIN_ACTIONS.SET_LOADING, payload: true });
     try {
-      const response = await axios.put(`/categories/${categoryId}`, categoryData);
-      dispatch({ type: ADMIN_ACTIONS.UPDATE_CATEGORY_SUCCESS, payload: response.data.category });
+      const response = await updateCategoryApi(categoryId, categoryData);
+      dispatch({
+        type: ADMIN_ACTIONS.UPDATE_CATEGORY_SUCCESS,
+        payload: response.data.category || response.data,
+      });
       return { success: true };
     } catch (error) {
-      const errorMessage = error.response?.data?.msg || 'Erreur lors de la mise à jour de la catégorie';
+      const errorMessage =
+        error.response?.data?.msg ||
+        "Erreur lors de la mise à jour de la catégorie";
       dispatch({ type: ADMIN_ACTIONS.SET_ERROR, payload: errorMessage });
       return { success: false, error: errorMessage };
     }
   }, []);
 
-  // Fonction pour supprimer une catégorie
   const deleteCategory = useCallback(async (categoryId) => {
     dispatch({ type: ADMIN_ACTIONS.SET_LOADING, payload: true });
     try {
-      await axios.delete(`/categories/${categoryId}`);
-      dispatch({ type: ADMIN_ACTIONS.DELETE_CATEGORY_SUCCESS, payload: categoryId });
+      await deleteCategoryApi(categoryId);
+      dispatch({
+        type: ADMIN_ACTIONS.DELETE_CATEGORY_SUCCESS,
+        payload: categoryId,
+      });
       return { success: true };
     } catch (error) {
-      const errorMessage = error.response?.data?.msg || 'Erreur lors de la suppression de la catégorie';
+      const errorMessage =
+        error.response?.data?.msg ||
+        "Erreur lors de la suppression de la catégorie";
       dispatch({ type: ADMIN_ACTIONS.SET_ERROR, payload: errorMessage });
       return { success: false, error: errorMessage };
     }
   }, []);
 
-  // Fonction pour récupérer les statistiques
-  const fetchStats = useCallback(async () => {
-    try {
-      // Fetch statistics from API
-      // Calculate statistics from existing data
-      const totalUsers = state.users.length;
-      const totalBooks = 0;
-      const totalLoans = 0;
-      const activeLoans = 0;
-      const overdueLoans = 0;
+  const fetchStats = useCallback(() => {
+    const totalUsers = state.users.length;
+    const totalBooks = 0;
+    const totalLoans = 0;
+    const activeLoans = 0;
+    const overdueLoans = 0;
 
-      dispatch({
-        type: ADMIN_ACTIONS.SET_STATS,
-        payload: {
-          totalUsers,
-          totalBooks,
-          totalLoans,
-          activeLoans,
-          overdueLoans
-        }
-      });
-    } catch (error) {
-      // Error loading statistics
-    }
+    dispatch({
+      type: ADMIN_ACTIONS.SET_STATS,
+      payload: {
+        totalUsers,
+        totalBooks,
+        totalLoans,
+        activeLoans,
+        overdueLoans,
+      },
+    });
   }, [state.users.length]);
 
-  // Fonction pour effacer les erreurs
   const clearError = useCallback(() => {
     dispatch({ type: ADMIN_ACTIONS.CLEAR_ERROR });
   }, []);
@@ -226,7 +264,7 @@ export const AdminProvider = ({ children }) => {
     updateCategory,
     deleteCategory,
     fetchStats,
-    clearError
+    clearError,
   };
 
   return (
@@ -236,7 +274,6 @@ export const AdminProvider = ({ children }) => {
   );
 };
 
-// Hook pour utiliser le contexte d'administration
 export const useAdmin = () => {
   const context = useContext(AdminContext);
   if (!context) {

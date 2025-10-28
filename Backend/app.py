@@ -1,21 +1,21 @@
-<<<<<<< HEAD
+from werkzeug.security import generate_password_hash
+from flask.cli import with_appcontext
+import click
 from flask import Flask, request
-=======
-from flask import Flask
 from flasgger import Swagger
 from swagger_config import swagger_template, swagger_config
->>>>>>> e26e354 (the last)
+
 from config import db, jwt, migrate, cors, bcrypt
 from models import User, Ebook, Category, Loan
 
-# importation des blueprints
+# Importation des blueprints
 from routes.route_user import user_bp
 from routes.routes_ebook import ebook_bp
 from routes.route_category import category_bp
 from routes.route_loan import loan_bp
 from api_docs import api_bp
 
-#  utilitaires
+# Utilitaires
 from utils.check_expired_loans import check_and_notify
 from utils.email_service import send_email
 
@@ -24,14 +24,13 @@ def create_app():
     app = Flask(__name__)
     app.config.from_object('config.Config')
 
-    # init extensions (but NOT cors yet)
+    # Initialisation des extensions
     db.init_app(app)
     jwt.init_app(app)
     migrate.init_app(app, db)
     bcrypt.init_app(app)
 
-<<<<<<< HEAD
-    # Configure CORS properly - ONLY ONCE!
+    # Configuration CORS
     cors.init_app(app, resources={
         r"/api/*": {
             "origins": ["http://localhost:5173", "http://127.0.0.1:5173"],
@@ -41,7 +40,7 @@ def create_app():
         }
     })
 
-    # Add after_request handler to ensure CORS headers
+    # Ajout des headers CORS après chaque requête
     @app.after_request
     def after_request(response):
         origin = request.headers.get('Origin')
@@ -51,15 +50,11 @@ def create_app():
             response.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization'
             response.headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, DELETE, OPTIONS, PATCH'
         return response
-=======
-    # initialisation Swagger
-    from flasgger import Swagger
+
+    # Swagger
     Swagger(app, config=swagger_config, template=swagger_template)
 
-
->>>>>>> e26e354 (the last)
-
-    #  route d'accueil
+    # Route d'accueil simple (liste les routes disponibles)
     @app.route('/')
     def index():
         import urllib
@@ -70,20 +65,57 @@ def create_app():
             output.append(line)
         return "<pre>" + '\n'.join(sorted(output)) + "</pre>"
 
-    # enregistrement blueprints
+    # Enregistrement des blueprints
     app.register_blueprint(user_bp, url_prefix='/api')
     app.register_blueprint(ebook_bp, url_prefix='/api')
     app.register_blueprint(category_bp, url_prefix='/api')
     app.register_blueprint(loan_bp, url_prefix='/api')
     app.register_blueprint(api_bp)
 
-    # création tables
+    # Création des tables si elles n'existent pas
     with app.app_context():
         db.create_all()
+
+    # Enregistrement des commandes CLI
+    register_commands(app)
 
     return app
 
 
+# =====================================================
+# Commande personnalisée : flask create-admin
+# =====================================================
+
+
+@click.command('create-admin')
+@with_appcontext
+@click.argument('email')
+@click.argument('password')
+def create_admin(email, password):
+    """Créer un utilisateur administrateur."""
+    from models import User
+    from config import db
+
+    # Vérifie si l'utilisateur existe déjà
+    if User.query.filter_by(email=email).first():
+        click.echo(f"L'utilisateur {email} existe déjà.")
+        return
+
+    hashed_password = generate_password_hash(password)
+    admin = User(email=email, password=hashed_password, is_admin=True)
+    db.session.add(admin)
+    db.session.commit()
+    click.echo(f"Administrateur créé avec succès : {email}")
+
+
+def register_commands(app):
+    """Enregistre les commandes CLI personnalisées."""
+    app.cli.add_command(create_admin)
+
+
+# =====================================================
+# Lancement de l'application
+# =====================================================
 if __name__ == '__main__':
     app = create_app()
     app.run(host='0.0.0.0', port=5000, debug=True)

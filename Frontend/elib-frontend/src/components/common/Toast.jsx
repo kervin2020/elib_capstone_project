@@ -1,72 +1,72 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { CheckCircle, XCircle, AlertCircle, Info, X } from 'lucide-react';
 
 const Toast = ({ id, type = 'info', title, message, duration = 5000, onClose }) => {
+    const [show, setShow] = useState(false);
+
     useEffect(() => {
+        setShow(true); // Start animation on mount
+
+        let hideTimer;
         if (duration > 0) {
-            const timer = setTimeout(() => {
-                onClose(id);
+            hideTimer = setTimeout(() => {
+                setShow(false);
+                setTimeout(() => onClose(id), 300); // Wait for animation to finish
             }, duration);
-            return () => clearTimeout(timer);
         }
+
+        return () => clearTimeout(hideTimer);
     }, [duration, id, onClose]);
 
     const getIcon = () => {
         switch (type) {
             case 'success':
-                return <CheckCircle className="h-5 w-5 text-green-500" />;
+                return <CheckCircle className="h-6 w-6 text-green-500" />;
             case 'error':
-                return <XCircle className="h-5 w-5 text-red-500" />;
+                return <XCircle className="h-6 w-6 text-red-500" />;
             case 'warning':
-                return <AlertCircle className="h-5 w-5 text-yellow-500" />;
+                return <AlertCircle className="h-6 w-6 text-yellow-500" />;
             case 'info':
             default:
-                return <Info className="h-5 w-5 text-blue-500" />;
+                return <Info className="h-6 w-6 text-blue-500" />;
         }
     };
 
     const getBackgroundColor = () => {
         switch (type) {
             case 'success':
-                return 'bg-green-50 border-green-200';
+                return 'bg-green-50 border-l-4 border-green-500';
             case 'error':
-                return 'bg-red-50 border-red-200';
+                return 'bg-red-50 border-l-4 border-red-500';
             case 'warning':
-                return 'bg-yellow-50 border-yellow-200';
+                return 'bg-yellow-50 border-l-4 border-yellow-500';
             case 'info':
             default:
-                return 'bg-blue-50 border-blue-200';
+                return 'bg-blue-50 border-l-4 border-blue-500';
         }
     };
 
     return (
-        <div className={`max-w-sm w-full ${getBackgroundColor()} border rounded-lg shadow-lg pointer-events-auto animate-slide-up`}>
-            <div className="p-4">
-                <div className="flex items-start">
-                    <div className="flex-shrink-0">
-                        {getIcon()}
-                    </div>
-                    <div className="ml-3 w-0 flex-1">
-                        {title && (
-                            <p className="text-sm font-medium text-gray-900">
-                                {title}
-                            </p>
-                        )}
-                        {message && (
-                            <p className={`text-sm ${title ? 'mt-1' : ''} text-gray-600`}>
-                                {message}
-                            </p>
-                        )}
-                    </div>
-                    <div className="ml-4 flex-shrink-0 flex">
-                        <button
-                            className="inline-flex text-gray-400 hover:text-gray-600 focus:outline-none focus:text-gray-600 transition-colors"
-                            onClick={() => onClose(id)}
-                        >
-                            <X className="h-5 w-5" />
-                        </button>
-                    </div>
+        <div
+            className={`max-w-sm w-full ${getBackgroundColor()} rounded-lg shadow-lg pointer-events-auto transform transition-all duration-300 ease-out
+        ${show ? 'translate-x-0 opacity-100' : 'translate-x-10 opacity-0'}
+      `}
+        >
+            <div className="p-4 flex items-start space-x-3">
+                <div className="flex-shrink-0">{getIcon()}</div>
+                <div className="flex-1 min-w-0">
+                    {title && <p className="text-sm font-semibold text-gray-900">{title}</p>}
+                    {message && <p className={`text-sm ${title ? 'mt-1' : ''} text-gray-700`}>{message}</p>}
                 </div>
+                <button
+                    onClick={() => {
+                        setShow(false);
+                        setTimeout(() => onClose(id), 300);
+                    }}
+                    className="ml-3 text-gray-400 hover:text-gray-600 focus:outline-none transition-colors"
+                >
+                    <X className="h-5 w-5" />
+                </button>
             </div>
         </div>
     );

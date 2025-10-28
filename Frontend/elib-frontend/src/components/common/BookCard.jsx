@@ -30,7 +30,7 @@ const BookCard = ({ book, onLoan, isLoaned, showLoanButton = true }) => {
   const status = getAvailabilityStatus();
 
   return (
-    <div className="card p-6 group">
+    <div className="card p-6 group bg-white rounded-xl shadow-lg p-6 text-center">
       {/* Book Cover Placeholder */}
       <div className="aspect-[3/4] bg-gradient-to-br from-primary-100 to-primary-200 rounded-lg mb-4 flex items-center justify-center">
         <BookOpen className="h-12 w-12 text-primary-600" />
@@ -104,7 +104,7 @@ const BookCard = ({ book, onLoan, isLoaned, showLoanButton = true }) => {
           {showLoanButton && book.available_copies > 0 && !isLoaned && (
             <button
               onClick={() => onLoan && onLoan(book.id)}
-              className="flex-1 btn-primary text-sm"
+              className="flex-1 bg-blue-600 text-sm text-white rounded-lg hover:bg-blue-700 transition-colors"
             >
               Borrow
             </button>

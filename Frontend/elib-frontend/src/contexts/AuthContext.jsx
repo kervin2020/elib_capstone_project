@@ -1,19 +1,14 @@
 import React, { createContext, useContext, useReducer, useEffect } from 'react';
-import axios from 'axios';
+import * as authApi from '../api/authApi';
 
-// Configuration de l'API
-const API_BASE_URL = 'http://localhost:5000/api';
-
-// État initial
 const initialState = {
     user: null,
     token: localStorage.getItem('token'),
     isAuthenticated: false,
     isLoading: true,
-    error: null
+    error: null,
 };
 
-// Types d'actions
 const AUTH_ACTIONS = {
     LOGIN_START: 'LOGIN_START',
     LOGIN_SUCCESS: 'LOGIN_SUCCESS',
@@ -23,20 +18,14 @@ const AUTH_ACTIONS = {
     REGISTER_SUCCESS: 'REGISTER_SUCCESS',
     REGISTER_FAILURE: 'REGISTER_FAILURE',
     CLEAR_ERROR: 'CLEAR_ERROR',
-    SET_LOADING: 'SET_LOADING'
+    SET_LOADING: 'SET_LOADING',
 };
 
-// Reducer pour gérer l'état d'authentification
 const authReducer = (state, action) => {
     switch (action.type) {
         case AUTH_ACTIONS.LOGIN_START:
         case AUTH_ACTIONS.REGISTER_START:
-            return {
-                ...state,
-                isLoading: true,
-                error: null
-            };
-        
+            return { ...state, isLoading: true, error: null };
         case AUTH_ACTIONS.LOGIN_SUCCESS:
         case AUTH_ACTIONS.REGISTER_SUCCESS:
             return {
@@ -45,9 +34,8 @@ const authReducer = (state, action) => {
                 token: action.payload.token,
                 isAuthenticated: true,
                 isLoading: false,
-                error: null
+                error: null,
             };
-        
         case AUTH_ACTIONS.LOGIN_FAILURE:
         case AUTH_ACTIONS.REGISTER_FAILURE:
             return {
@@ -56,9 +44,8 @@ const authReducer = (state, action) => {
                 token: null,
                 isAuthenticated: false,
                 isLoading: false,
-                error: action.payload
+                error: action.payload,
             };
-        
         case AUTH_ACTIONS.LOGOUT:
             return {
                 ...state,
@@ -66,74 +53,33 @@ const authReducer = (state, action) => {
                 token: null,
                 isAuthenticated: false,
                 isLoading: false,
-                error: null
+                error: null,
             };
-        
         case AUTH_ACTIONS.CLEAR_ERROR:
-            return {
-                ...state,
-                error: null
-            };
-        
+            return { ...state, error: null };
         case AUTH_ACTIONS.SET_LOADING:
-            return {
-                ...state,
-                isLoading: action.payload
-            };
-        
+            return { ...state, isLoading: action.payload };
         default:
             return state;
     }
 };
 
-// Création du contexte
 const AuthContext = createContext();
 
-// Configuration d'axios avec intercepteur pour le token
-axios.defaults.baseURL = API_BASE_URL;
-
-// Intercepteur pour ajouter le token aux requêtes
-axios.interceptors.request.use(
-    (config) => {
-        const token = localStorage.getItem('token');
-        if (token) {
-            config.headers.Authorization = `Bearer ${token}`;
-        }
-        return config;
-    },
-    (error) => {
-        return Promise.reject(error);
-    }
-);
-
-// Intercepteur pour gérer les erreurs de réponse
-axios.interceptors.response.use(
-    (response) => response,
-    (error) => {
-        if (error.response?.status === 401) {
-            localStorage.removeItem('token');
-            window.location.href = '/login';
-        }
-        return Promise.reject(error);
-    }
-);
-
-// Provider du contexte d'authentification
 export const AuthProvider = ({ children }) => {
-    const [state, dispatch] = useReducer(authReducer, initialState);
+    const [state, dispatch] = React.useReducer(authReducer, initialState);
 
-    // Vérifier l'authentification au chargement
     useEffect(() => {
         const checkAuth = async () => {
             const token = localStorage.getItem('token');
             if (token) {
                 try {
-                    const response = await axios.get('/users/me');
+                    const resp = await authApi.getCurrentUser();
                     dispatch({
                         type: AUTH_ACTIONS.LOGIN_SUCCESS,
-                        payload: { user: response.data, token }
+                        payload: { user: resp.data, token },
                     });
-                } catch (error) {
+                } catch {
                     localStorage.removeItem('token');
                     dispatch({ type: AUTH_ACTIONS.LOGOUT });
                 }
@@ -144,69 +90,74 @@ export const AuthProvider = ({ children }) => {
         checkAuth();
     }, []);
 
-    // Fonction de connexion
     const login = async (email, password) => {
         dispatch({ type: AUTH_ACTIONS.LOGIN_START });
         try {
-            const response = await axios.post('/login', { email, password });
-            const { access_token } = response.data;
-            localStorage.setItem('token', access_token);
+            const response = await authApi.login(email, password);
+            const accessToken = response.data?.access_token || response.data?.token || null;
+            if (!accessToken) {
+                throw new Error('No access token returned from server');
+            }
+            localStorage.setItem('token', accessToken);
 
-            // Récupérer les informations utilisateur
-            const userResponse = await axios.get('/users/me');
+            const userResp = await authApi.getCurrentUser();
             dispatch({
                 type: AUTH_ACTIONS.LOGIN_SUCCESS,
-                payload: { user: userResponse.data, token: access_token }
+                payload: { user: userResp.data, token: accessToken },
             });
             return { success: true };
         } catch (error) {
-            const errorMessage = error.response?.data?.msg || 'Erreur de connexion';
+            const errorMessage =
+                error.response?.data?.msg ||
+                error.response?.data?.message ||
+                error.message ||
+                'Login failed';
             dispatch({ type: AUTH_ACTIONS.LOGIN_FAILURE, payload: errorMessage });
             return { success: false, error: errorMessage };
         }
     };
 
-    // Fonction d'inscription
     const register = async (userData) => {
         dispatch({ type: AUTH_ACTIONS.REGISTER_START });
         try {
-            const response = await axios.post('/users', userData);
+            // create user
+            await authApi.register(userData);
 
-            // Auto-login after registration
-            const loginResponse = await axios.post('/login', {
-                email: userData.email,
-                password: userData.password
-            });
-            const { access_token } = loginResponse.data;
-            localStorage.setItem('token', access_token);
+            // login immediately after registration
+            const loginResp = await authApi.login(userData.email, userData.password);
+            const accessToken = loginResp.data?.access_token || loginResp.data?.token || null;
+            if (!accessToken) {
+                throw new Error('No access token returned after registration');
+            }
+            localStorage.setItem('token', accessToken);
 
+            const userResp = await authApi.getCurrentUser();
             dispatch({
                 type: AUTH_ACTIONS.REGISTER_SUCCESS,
-                payload: { user: response.data.user, token: access_token }
+                payload: { user: userResp.data, token: accessToken },
             });
             return { success: true };
         } catch (error) {
-            const errorMessage = error.response?.data?.msg || 'Erreur d\'inscription';
+            const errorMessage =
+                error.response?.data?.msg ||
+                error.response?.data?.message ||
+                error.message ||
+                'Registration failed';
             dispatch({ type: AUTH_ACTIONS.REGISTER_FAILURE, payload: errorMessage });
             return { success: false, error: errorMessage };
         }
     };
 
-    // Fonction de déconnexion
     const logout = () => {
         localStorage.removeItem('token');
         dispatch({ type: AUTH_ACTIONS.LOGOUT });
     };
 
-    // Fonction pour effacer les erreurs
     const clearError = () => {
         dispatch({ type: AUTH_ACTIONS.CLEAR_ERROR });
     };
 
-    // Vérifier si l'utilisateur est admin
-    const isAdmin = () => {
-        return state.user?.is_admin || false;
-    };
+    const isAdmin = () => !!state.user?.is_admin;
 
     const value = {
         ...state,
@@ -214,17 +165,12 @@ export const AuthProvider = ({ children }) => {
         register,
         logout,
         clearError,
-        isAdmin
+        isAdmin,
     };
 
-    return (
-        <AuthContext.Provider value={value}>
-            {children}
-        </AuthContext.Provider>
-    );
+    return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
-// Hook pour utiliser le contexte d'authentification
 export const useAuth = () => {
     const context = useContext(AuthContext);
     if (!context) {

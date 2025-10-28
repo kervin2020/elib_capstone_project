@@ -1,5 +1,12 @@
 import React, { createContext, useContext, useReducer, useEffect, useCallback } from 'react';
-import axios from 'axios';
+import { useAuth } from './AuthContext';
+import {
+  getLoans as fetchAllLoans,
+  getLoanById,
+  createLoan as createNewLoan,
+  returnLoan,
+  deleteLoan as removeLoan
+} from '../api/loanApi';
 
 // État initial
 const initialState = {
@@ -28,7 +35,7 @@ const LOAN_ACTIONS = {
   SET_STATS: 'SET_STATS'
 };
 
-// Reducer pour gérer l'état des emprunts
+// Reducer pour gérer l'état
 const loanReducer = (state, action) => {
   switch (action.type) {
     case LOAN_ACTIONS.SET_LOADING:
@@ -42,22 +49,20 @@ const loanReducer = (state, action) => {
     case LOAN_ACTIONS.FETCH_LOAN_SUCCESS:
       return { ...state, currentLoan: action.payload, isLoading: false, error: null };
     case LOAN_ACTIONS.CREATE_LOAN_SUCCESS:
-      return { ...state, loans: [...state.loans, action.payload], isLoading: false, error: null };
+      return { ...state, loans: [...state.loans, action.payload], isLoading: false };
     case LOAN_ACTIONS.UPDATE_LOAN_SUCCESS:
       return {
         ...state,
-        loans: state.loans.map(loan => loan.id === action.payload.id ? action.payload : loan),
+        loans: state.loans.map(l => (l.id === action.payload.id ? action.payload : l)),
         currentLoan: state.currentLoan?.id === action.payload.id ? action.payload : state.currentLoan,
-        isLoading: false,
-        error: null
+        isLoading: false
       };
     case LOAN_ACTIONS.DELETE_LOAN_SUCCESS:
       return {
         ...state,
-        loans: state.loans.filter(loan => loan.id !== action.payload),
+        loans: state.loans.filter(l => l.id !== action.payload),
         currentLoan: state.currentLoan?.id === action.payload ? null : state.currentLoan,
-        isLoading: false,
-        error: null
+        isLoading: false
       };
     case LOAN_ACTIONS.SET_STATS:
       return { ...state, stats: action.payload };
@@ -69,131 +74,125 @@ const loanReducer = (state, action) => {
 // Création du contexte
 const LoanContext = createContext();
 
-// Provider du contexte des emprunts
+// Provider
 export const LoanProvider = ({ children }) => {
   const [state, dispatch] = useReducer(loanReducer, initialState);
+  const { isAuthenticated } = useAuth();
 
-  // Fonction pour récupérer tous les emprunts
+  // Récupérer tous les emprunts
   const fetchLoans = useCallback(async () => {
     dispatch({ type: LOAN_ACTIONS.SET_LOADING, payload: true });
     try {
-      const response = await axios.get('/loans');
-      dispatch({ type: LOAN_ACTIONS.FETCH_LOANS_SUCCESS, payload: response.data.loans });
+      const { data } = await fetchAllLoans();
+      dispatch({ type: LOAN_ACTIONS.FETCH_LOANS_SUCCESS, payload: data.loans || data });
     } catch (error) {
-      dispatch({ type: LOAN_ACTIONS.SET_ERROR, payload: error.response?.data?.msg || 'Erreur lors du chargement des emprunts' });
+      dispatch({
+        type: LOAN_ACTIONS.SET_ERROR,
+        payload: error.response?.data?.msg || 'Erreur lors du chargement des emprunts'
+      });
     }
   }, []);
 
-  // Fonction pour récupérer un emprunt spécifique
+  // Récupérer un emprunt spécifique
   const fetchLoan = useCallback(async (loanId) => {
     dispatch({ type: LOAN_ACTIONS.SET_LOADING, payload: true });
     try {
-      const response = await axios.get(`/loans/${loanId}`);
-      dispatch({ type: LOAN_ACTIONS.FETCH_LOAN_SUCCESS, payload: response.data });
+      const { data } = await getLoanById(loanId);
+      dispatch({ type: LOAN_ACTIONS.FETCH_LOAN_SUCCESS, payload: data });
     } catch (error) {
-      dispatch({ type: LOAN_ACTIONS.SET_ERROR, payload: error.response?.data?.msg || 'Erreur lors du chargement de l\'emprunt' });
+      dispatch({
+        type: LOAN_ACTIONS.SET_ERROR,
+        payload: error.response?.data?.msg || 'Erreur lors du chargement de l\'emprunt'
+      });
     }
   }, []);
 
-  // Fonction pour créer un emprunt
-  const createLoan = useCallback(async (ebookId) => {
+  // Créer un nouvel emprunt
+  const createLoan = useCallback(async (bookId) => {
     dispatch({ type: LOAN_ACTIONS.SET_LOADING, payload: true });
     try {
-      const response = await axios.post('/loans', { ebook_id: ebookId });
-      dispatch({ type: LOAN_ACTIONS.CREATE_LOAN_SUCCESS, payload: response.data.loan });
+      const { data } = await createNewLoan(bookId);
+      dispatch({ type: LOAN_ACTIONS.CREATE_LOAN_SUCCESS, payload: data.loan || data });
       return { success: true };
     } catch (error) {
-      const errorMessage = error.response?.data?.msg || 'Erreur lors de la création de l\'emprunt';
-      dispatch({ type: LOAN_ACTIONS.SET_ERROR, payload: errorMessage });
-      return { success: false, error: errorMessage };
+      const message = error.response?.data?.msg || 'Erreur lors de la création de l\'emprunt';
+      dispatch({ type: LOAN_ACTIONS.SET_ERROR, payload: message });
+      return { success: false, error: message };
     }
   }, []);
 
-  // Fonction pour retourner un livre
+  // Retourner un livre
   const returnBook = useCallback(async (loanId) => {
     dispatch({ type: LOAN_ACTIONS.SET_LOADING, payload: true });
     try {
-      const response = await axios.put(`/loans/${loanId}`);
-      dispatch({ type: LOAN_ACTIONS.UPDATE_LOAN_SUCCESS, payload: response.data.loan });
+      const { data } = await returnLoan(loanId);
+      dispatch({ type: LOAN_ACTIONS.UPDATE_LOAN_SUCCESS, payload: data.loan || data });
       return { success: true };
     } catch (error) {
-      const errorMessage = error.response?.data?.msg || 'Erreur lors du retour du livre';
-      dispatch({ type: LOAN_ACTIONS.SET_ERROR, payload: errorMessage });
-      return { success: false, error: errorMessage };
+      const message = error.response?.data?.msg || 'Erreur lors du retour du livre';
+      dispatch({ type: LOAN_ACTIONS.SET_ERROR, payload: message });
+      return { success: false, error: message };
     }
   }, []);
 
-  // Fonction pour supprimer un emprunt (admin)
+  // Supprimer un emprunt
   const deleteLoan = useCallback(async (loanId) => {
     dispatch({ type: LOAN_ACTIONS.SET_LOADING, payload: true });
     try {
-      await axios.delete(`/loans/${loanId}`);
+      await removeLoan(loanId);
       dispatch({ type: LOAN_ACTIONS.DELETE_LOAN_SUCCESS, payload: loanId });
       return { success: true };
     } catch (error) {
-      const errorMessage = error.response?.data?.msg || 'Erreur lors de la suppression de l\'emprunt';
-      dispatch({ type: LOAN_ACTIONS.SET_ERROR, payload: errorMessage });
-      return { success: false, error: errorMessage };
+      const message = error.response?.data?.msg || 'Erreur lors de la suppression de l\'emprunt';
+      dispatch({ type: LOAN_ACTIONS.SET_ERROR, payload: message });
+      return { success: false, error: message };
     }
   }, []);
 
-  // Fonction pour effacer les erreurs
+  // Effacer les erreurs
   const clearError = useCallback(() => {
     dispatch({ type: LOAN_ACTIONS.CLEAR_ERROR });
   }, []);
 
-  // Fonction pour obtenir les emprunts actifs d'un utilisateur
-  const getUserActiveLoans = useCallback((userId) => {
-    return state.loans.filter(loan => loan.user_id === userId && !loan.is_returned);
-  }, [state.loans]);
+  // Méthodes utilitaires
+  const getUserActiveLoans = useCallback(
+    (userId) => state.loans.filter(l => l.user_id === userId && !l.is_returned),
+    [state.loans]
+  );
 
-  // Fonction pour obtenir l'historique des emprunts d'un utilisateur
-  const getUserLoanHistory = useCallback((userId) => {
-    return state.loans.filter(loan => loan.user_id === userId);
-  }, [state.loans]);
+  const getUserLoanHistory = useCallback(
+    (userId) => state.loans.filter(l => l.user_id === userId),
+    [state.loans]
+  );
 
-  // Fonction pour obtenir les emprunts en retard
   const getOverdueLoans = useCallback(() => {
     const now = new Date();
-    return state.loans.filter(loan =>
-      !loan.is_returned && new Date(loan.due_date) < now
-    );
+    return state.loans.filter(l => !l.is_returned && new Date(l.due_date) < now);
   }, [state.loans]);
 
-  // Fonction pour vérifier si un livre est emprunté par un utilisateur
-  const isBookLoanedByUser = useCallback((bookId, userId) => {
-    return state.loans.some(loan =>
-      loan.ebook_id === bookId && loan.user_id === userId && !loan.is_returned
-    );
-  }, [state.loans]);
+  const isBookLoanedByUser = useCallback(
+    (bookId, userId) => state.loans.some(l => l.ebook_id === bookId && l.user_id === userId && !l.is_returned),
+    [state.loans]
+  );
 
-  // Calculer les statistiques
   const calculateStats = useCallback(() => {
     const totalLoans = state.loans.length;
-    const activeLoans = state.loans.filter(loan => !loan.is_returned).length;
+    const activeLoans = state.loans.filter(l => !l.is_returned).length;
     const now = new Date();
-    const overdueLoans = state.loans.filter(loan =>
-      !loan.is_returned && new Date(loan.due_date) < now
-    ).length;
-    const returnedLoans = state.loans.filter(loan => loan.is_returned).length;
+    const overdueLoans = state.loans.filter(l => !l.is_returned && new Date(l.due_date) < now).length;
+    const returnedLoans = state.loans.filter(l => l.is_returned).length;
 
     dispatch({
       type: LOAN_ACTIONS.SET_STATS,
-      payload: {
-        totalLoans,
-        activeLoans,
-        overdueLoans,
-        returnedLoans
-      }
+      payload: { totalLoans, activeLoans, overdueLoans, returnedLoans }
     });
   }, [state.loans]);
 
-  // Charger les emprunts au montage du composant (une seule fois)
+  // Charger les emprunts après login
   useEffect(() => {
-    fetchLoans();
-  }, [fetchLoans]);
+    if (isAuthenticated) fetchLoans();
+  }, [isAuthenticated, fetchLoans]);
 
-  // Recalculer les stats quand les emprunts changent
   useEffect(() => {
     calculateStats();
   }, [calculateStats]);
@@ -212,14 +211,10 @@ export const LoanProvider = ({ children }) => {
     isBookLoanedByUser
   };
 
-  return (
-    <LoanContext.Provider value={value}>
-      {children}
-    </LoanContext.Provider>
-  );
+  return <LoanContext.Provider value={value}>{children}</LoanContext.Provider>;
 };
 
-// Hook pour utiliser le contexte des emprunts
+// Hook d'accès
 export const useLoans = () => {
   const context = useContext(LoanContext);
   if (!context) {

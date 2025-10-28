@@ -45,12 +45,7 @@ const LoginForm = () => {
                     <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
                         Sign in to your account
                     </h2>
-                    <p className="mt-2 text-center text-sm text-gray-600">
-                        Or{' '}
-                        <Link to="/register" className="font-medium text-primary-900 hover:text-primary-800">
-                            create a new account
-                        </Link>
-                    </p>
+
                 </div>
 
                 <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
@@ -125,7 +120,7 @@ const LoginForm = () => {
                         <button
                             type="submit"
                             disabled={isLoading}
-                            className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-black bg-primary-900 hover:bg-primary-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+                            className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-black text-white bg-blue-700 hover:bg-blue-800 hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
                         >
                             {isLoading ? (
                                 <div className="flex items-center space-x-2">
@@ -140,6 +135,12 @@ const LoginForm = () => {
 
                     {/* Additional Links */}
                     <div className="text-center">
+                        <p className="mt-2 text-center text-sm text-gray-600">
+                            Or{' '}
+                            <Link to="/register" className="font-medium text-blue-900 hover:text-blue-800">
+                                create a new account
+                            </Link>
+                        </p>
                         <Link to="/forgot-password" className="text-sm text-primary-900 hover:text-primary-800">
                             Forgot your password?
                         </Link>

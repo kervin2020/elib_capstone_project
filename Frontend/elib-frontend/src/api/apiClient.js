@@ -3,7 +3,7 @@ import axios from 'axios';
 import { toast } from 'react-hot-toast';
 
 const apiClient = axios.create({
-    baseURL: import.meta.env.VITE_API_URL || 'https://capstone-backend-elib.onrender.com/api',
+    baseURL: import.meta.env.VITE_API_URL || 'https://capstone-backend-elib.onrender.com/api' || 'http://localhost:5000/api',
     withCredentials: true,
 });
 

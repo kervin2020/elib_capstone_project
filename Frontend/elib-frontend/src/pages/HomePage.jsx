@@ -88,8 +88,8 @@ const HomePage = () => {
                         </p>
 
                         {/* Search Bar */}
-                        <div className=" flex-1 max-w-lg mx-15 mb-8">
-                            <form onSubmit={handleSearch} className="w-full">
+                        <div className="flex justify-center mb-8">
+                            <form onSubmit={handleSearch} className="w-full max-w-lg">
                                 <div className="relative">
                                     <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                                     <input
@@ -97,11 +97,12 @@ const HomePage = () => {
                                         placeholder="Search books..."
                                         value={searchQuery}
                                         onChange={(e) => setSearchQuery(e.target.value)}
-                                        className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                                        className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                                     />
                                 </div>
                             </form>
                         </div>
+
 
                         {/* CTA Buttons */}
                         <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -247,38 +248,53 @@ const HomePage = () => {
             </section>
 
             {/* User Reviews Section */}
-            <section className="py-16 bg-gray-50">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="text-center mb-12">
-                        <h2 className="text-3xl font-bold text-gray-900 mb-4">User Reviews</h2>
-                        <p className="text-lg text-gray-600">What our readers say about us.</p>
+
+            <section className="py-20 bg-gray-50">
+                <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
+                    <div className="text-center mb-16">
+                        <h2 className="text-4xl font-bold text-gray-900 mb-4">What Our Readers Say</h2>
+                        <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+                            Discover what other readers think about our library and reading experience.
+                        </p>
                     </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
                         {reviews.map((review) => (
-                            <div key={review.id} className="card p-6 bg-white rounded-xl shadow-lg p-6 text-center transition-transform hover:scale-105">
-                                <div className="flex items-center space-x-3 mb-4">
-                                    <div className="w-10 h-10 bg-primary-100 rounded-full flex items-center justify-center">
-                                        <span className="text-sm font-medium text-primary-900">{review.avatar}</span>
-                                    </div>
-                                    <div>
-                                        <h4 className="font-medium text-gray-900">{review.name}</h4>
-                                        <div className="flex items-center space-x-1">
-                                            {[...Array(5)].map((_, i) => (
-                                                <Star
-                                                    key={i}
-                                                    className={`h-4 w-4 ${i < review.rating ? 'text-yellow-400 fill-current' : 'text-gray-300'
-                                                        }`}
-                                                />
-                                            ))}
-                                        </div>
-                                    </div>
+                            <div
+                                key={review.id}
+                                className="bg-white rounded-2xl shadow-lg p-8 flex flex-col items-center text-center hover:shadow-xl transition-shadow duration-300"
+                            >
+                                {/* Avatar */}
+                                <div className="w-16 h-16 bg-primary-100 rounded-full flex items-center justify-center mb-4">
+                                    <span className="text-lg font-semibold text-primary-900">
+                                        {review.avatar}
+                                    </span>
                                 </div>
-                                <p className="text-gray-600 text-sm">{review.comment}</p>
+
+                                {/* User name */}
+                                <h4 className="font-semibold text-gray-900 text-lg mb-2">{review.name}</h4>
+
+                                {/* Stars */}
+                                <div className="flex items-center justify-center mb-4">
+                                    {[...Array(5)].map((_, i) => (
+                                        <Star
+                                            key={i}
+                                            className={`h-5 w-5 ${i < review.rating
+                                                ? 'text-yellow-400 fill-current'
+                                                : 'text-gray-300'
+                                                }`}
+                                        />
+                                    ))}
+                                </div>
+
+                                {/* Comment */}
+                                <p className="text-gray-600 text-sm leading-relaxed">{review.comment}</p>
                             </div>
                         ))}
                     </div>
                 </div>
             </section>
+
         </div>
     );
 };

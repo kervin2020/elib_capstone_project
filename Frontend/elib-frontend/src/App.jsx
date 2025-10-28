@@ -20,6 +20,7 @@ import LoginForm from "./components/auth/LoginForm";
 import RegisterForm from "./components/auth/RegisterForm";
 import AuthLayout from "./layouts/AuthLayout";
 import AdminLayout from "./layouts/AdminLayout";
+import BookDetailPage from "./pages/BookDetailPage";
 
 const ProtectedRoute = ({ children, requireAdmin = false }) => {
     const { isAuthenticated, user } = useAuth();
@@ -52,6 +53,7 @@ const AppRoutes = () => {
         <Routes>
             <Route path="/" element={<Layout><HomePage /></Layout>} />
             <Route path="/books" element={<Layout><BooksPage /></Layout>} />
+            <Route path="/books/:id" element={<Layout><BookDetailPage /></Layout>} />
             <Route
                 path="/login"
                 element={

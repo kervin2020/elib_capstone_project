@@ -225,7 +225,7 @@ const AddBookModal = ({ isOpen, onClose }) => {
           <button
             type="submit"
             disabled={isLoading}
-            className="flex items-center space-x-2 px-4 py-2 text-sm font-medium text-black bg-primary-900 hover:bg-primary-800 rounded-lg transition-colors disabled:opacity-50"
+            className="flex items-center space-x-2 px-4 py-2 text-sm font-medium text-white bg-blue-900 hover:bg-blue-800 rounded-lg transition-colors disabled:opacity-50"
           >
             {isLoading ? (
               <>

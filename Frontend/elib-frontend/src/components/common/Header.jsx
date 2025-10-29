@@ -5,47 +5,43 @@ import { useAuth } from '../../contexts/AuthContext';
 
 const Header = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
-
     const { user, isAuthenticated, logout } = useAuth();
     const navigate = useNavigate();
+    const location = useLocation();
 
     const handleLogout = () => {
         logout();
         navigate('/');
     };
 
-
-
-    const isActive = (path) => {
-        return location.pathname === path;
-    };
+    const isActive = (path) => location.pathname === path;
 
     return (
-        <header className="bg-white shadow-lg sticky top-0 z-50">
+        <header className="bg-white shadow-md sticky top-0 z-50 border-b border-gray-200">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex justify-between items-center h-16">
                     {/* Logo */}
                     <Link to="/" className="flex items-center space-x-2">
-                        <BookOpen className="h-8 w-8 text-primary-900" />
-                        <span className="text-2xl font-bold text-primary-900">E-Lib</span>
+                        <BookOpen className="h-8 w-8 text-blue-600" />
+                        <span className="text-2xl font-bold text-gray-900">E-Lib</span>
                     </Link>
 
-                    {/* Navigation Desktop */}
-                    <nav className="hidden md:flex items-center space-x-8">
+                    {/* Desktop Navigation */}
+                    <nav className="hidden md:flex items-center space-x-6">
                         <Link
                             to="/"
-                            className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${isActive('/')
-                                ? 'text-primary-900 bg-primary-100'
-                                : 'text-gray-700 hover:text-primary-900 hover:bg-gray-100'
+                            className={`px-3 py-2 rounded-md text-sm font-medium transition-all duration-200 ${isActive('/')
+                                ? 'text-blue-600 bg-blue-50 font-semibold'
+                                : 'text-gray-700 hover:text-blue-600 hover:bg-gray-100'
                                 }`}
                         >
                             Home
                         </Link>
                         <Link
                             to="/books"
-                            className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${isActive('/books')
-                                ? 'text-primary-900 bg-primary-100'
-                                : 'text-gray-700 hover:text-primary-900 hover:bg-gray-100'
+                            className={`px-3 py-2 rounded-md text-sm font-medium transition-all duration-200 ${isActive('/books')
+                                ? 'text-blue-600 bg-blue-50 font-semibold'
+                                : 'text-gray-700 hover:text-blue-600 hover:bg-gray-100'
                                 }`}
                         >
                             Books
@@ -53,9 +49,9 @@ const Header = () => {
                         {isAuthenticated && (
                             <Link
                                 to="/loans"
-                                className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${isActive('/loans')
-                                    ? 'text-primary-900 bg-primary-100'
-                                    : 'text-gray-700 hover:text-primary-900 hover:bg-gray-100'
+                                className={`px-3 py-2 rounded-md text-sm font-medium transition-all duration-200 ${isActive('/loans')
+                                    ? 'text-blue-600 bg-blue-50 font-semibold'
+                                    : 'text-gray-700 hover:text-blue-600 hover:bg-gray-100'
                                     }`}
                             >
                                 My Loans
@@ -64,9 +60,9 @@ const Header = () => {
                         {isAuthenticated && user?.is_admin && (
                             <Link
                                 to="/admin"
-                                className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${isActive('/admin')
-                                    ? 'text-primary-900 bg-primary-100'
-                                    : 'text-gray-700 hover:text-primary-900 hover:bg-gray-100'
+                                className={`px-3 py-2 rounded-md text-sm font-medium transition-all duration-200 ${isActive('/admin')
+                                    ? 'text-blue-600 bg-blue-50 font-semibold'
+                                    : 'text-gray-700 hover:text-blue-600 hover:bg-gray-100'
                                     }`}
                             >
                                 Admin
@@ -74,9 +70,7 @@ const Header = () => {
                         )}
                     </nav>
 
-
-
-                    {/* User Menu */}
+                    {/* User Section */}
                     <div className="flex items-center space-x-4">
                         {isAuthenticated ? (
                             <div className="flex items-center space-x-4">
@@ -88,21 +82,24 @@ const Header = () => {
                                 </div>
                                 <button
                                     onClick={handleLogout}
-                                    className="flex items-center space-x-1 text-gray-600 hover:text-red-600 transition-colors"
+                                    className="flex items-center space-x-1 text-gray-600 hover:text-red-600 transition-all duration-200"
                                 >
                                     <LogOut className="h-4 w-4" />
-                                    <span className="text-sm">Logout</span>
+                                    <span className="text-sm font-medium">Logout</span>
                                 </button>
                             </div>
                         ) : (
                             <div className="flex items-center space-x-4">
                                 <Link
                                     to="/login"
-                                    className="text-gray-700 hover:text-primary-900 transition-colors"
+                                    className="text-gray-700 hover:text-blue-600 transition-all duration-200"
                                 >
                                     Login
                                 </Link>
-                                <Link to="/register" className="btn-primary">
+                                <Link
+                                    to="/register"
+                                    className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 transition-all duration-200"
+                                >
                                     Join Now
                                 </Link>
                             </div>
@@ -111,7 +108,7 @@ const Header = () => {
                         {/* Mobile Menu Button */}
                         <button
                             onClick={() => setIsMenuOpen(!isMenuOpen)}
-                            className="md:hidden p-2 rounded-md text-gray-700 hover:text-primary-900 hover:bg-gray-100"
+                            className="md:hidden p-2 rounded-md text-gray-700 hover:text-blue-600 hover:bg-gray-100 transition-all"
                         >
                             {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
                         </button>
@@ -120,51 +117,36 @@ const Header = () => {
 
                 {/* Mobile Menu */}
                 {isMenuOpen && (
-                    <div className="md:hidden">
-                        <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-gray-50 rounded-lg mt-2">
-                            {/* Mobile Search
-                            <form onSubmit={handleSearch} className="mb-4">
-                                <div className="relative">
-                                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                                    <input
-                                        type="text"
-                                        placeholder="Search books..."
-                                        value={searchQuery}
-                                        onChange={(e) => setSearchQuery(e.target.value)}
-                                        className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                                    />
-                                </div>
-                            </form> */}
-
-                            {/* Mobile Navigation Links */}
+                    <div className="md:hidden animate-slide-down">
+                        <div className="px-4 pt-3 pb-4 bg-gray-50 rounded-lg mt-2 space-y-2 shadow-md">
                             <Link
                                 to="/"
-                                className={`block px-3 py-2 rounded-md text-base font-medium transition-colors ${isActive('/')
-                                    ? 'text-primary-900 bg-primary-100'
-                                    : 'text-gray-700 hover:text-primary-900 hover:bg-gray-100'
-                                    }`}
                                 onClick={() => setIsMenuOpen(false)}
+                                className={`block px-3 py-2 rounded-md text-base font-medium transition-colors ${isActive('/')
+                                    ? 'text-blue-600 bg-blue-100'
+                                    : 'text-gray-700 hover:text-blue-600 hover:bg-gray-100'
+                                    }`}
                             >
                                 Home
                             </Link>
                             <Link
                                 to="/books"
-                                className={`block px-3 py-2 rounded-md text-base font-medium transition-colors ${isActive('/books')
-                                    ? 'text-primary-900 bg-primary-100'
-                                    : 'text-gray-700 hover:text-primary-900 hover:bg-gray-100'
-                                    }`}
                                 onClick={() => setIsMenuOpen(false)}
+                                className={`block px-3 py-2 rounded-md text-base font-medium transition-colors ${isActive('/books')
+                                    ? 'text-blue-600 bg-blue-100'
+                                    : 'text-gray-700 hover:text-blue-600 hover:bg-gray-100'
+                                    }`}
                             >
                                 Books
                             </Link>
                             {isAuthenticated && (
                                 <Link
                                     to="/loans"
-                                    className={`block px-3 py-2 rounded-md text-base font-medium transition-colors ${isActive('/loans')
-                                        ? 'text-primary-900 bg-primary-100'
-                                        : 'text-gray-700 hover:text-primary-900 hover:bg-gray-100'
-                                        }`}
                                     onClick={() => setIsMenuOpen(false)}
+                                    className={`block px-3 py-2 rounded-md text-base font-medium transition-colors ${isActive('/loans')
+                                        ? 'text-blue-600 bg-blue-100'
+                                        : 'text-gray-700 hover:text-blue-600 hover:bg-gray-100'
+                                        }`}
                                 >
                                     My Loans
                                 </Link>
@@ -172,11 +154,11 @@ const Header = () => {
                             {isAuthenticated && user?.is_admin && (
                                 <Link
                                     to="/admin"
-                                    className={`block px-3 py-2 rounded-md text-base font-medium transition-colors ${isActive('/admin')
-                                        ? 'text-primary-900 bg-primary-100'
-                                        : 'text-gray-700 hover:text-primary-900 hover:bg-gray-100'
-                                        }`}
                                     onClick={() => setIsMenuOpen(false)}
+                                    className={`block px-3 py-2 rounded-md text-base font-medium transition-colors ${isActive('/admin')
+                                        ? 'text-blue-600 bg-blue-100'
+                                        : 'text-gray-700 hover:text-blue-600 hover:bg-gray-100'
+                                        }`}
                                 >
                                     Admin
                                 </Link>

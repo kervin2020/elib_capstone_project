@@ -35,16 +35,24 @@ const ProtectedRoute = ({ children, requireAdmin = false }) => {
 };
 
 const Layout = ({ children }) => {
+    const location = window.location.pathname;
+    const isHome = location === "/";
+
     const { toasts, removeToast } = useToast();
+
     return (
         <div className="min-h-screen flex flex-col bg-gray-50">
             <Header />
-            <main className="flex-1 container mx-auto p-6">{children}</main>
+            {/* If on home page, remove container constraints */}
+            <main className={`flex-1 ${isHome ? "p-0" : "container mx-auto p-6"}`}>
+                {children}
+            </main>
             <Footer />
             <ToastContainer toasts={toasts} onClose={removeToast} />
         </div>
     );
 };
+
 
 const AppRoutes = () => {
     const { isAuthenticated } = useAuth();

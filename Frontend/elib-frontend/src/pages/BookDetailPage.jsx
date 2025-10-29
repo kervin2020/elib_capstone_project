@@ -5,7 +5,7 @@ import { ArrowLeft, BookOpen } from 'lucide-react';
 import LoadingSpinner from '../components/common/LoadingSpinner';
 
 const BookDetailPage = () => {
-    const { id } = useParams(); // récupère l'ID du livre depuis l'URL
+    const { id } = useParams();
     const [book, setBook] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
 
@@ -26,67 +26,78 @@ const BookDetailPage = () => {
         fetchBookDetails();
     }, [id]);
 
-    if (isLoading) {
-        return <LoadingSpinner size="large" />;
-    }
+    if (isLoading) return <LoadingSpinner size="large" />;
 
-    if (!book) {
+    if (!book)
         return (
-            <div className="text-center py-10">
-                <h2 className="text-xl font-semibold text-gray-700">Livre introuvable</h2>
-                <Link to="/books" className="text-primary-600 mt-4 block">
-                    ← Retour à la liste
+            <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50 px-4">
+                <h2 className="text-2xl font-semibold text-gray-700 mb-4">Livre introuvable</h2>
+                <Link
+                    to="/books"
+                    className="text-cyan-600 hover:text-cyan-800 font-medium transition-colors"
+                >
+                    ← Retour à la bibliothèque
                 </Link>
             </div>
         );
-    }
 
     return (
-        <div className="min-h-screen bg-gray-50 py-12 px-4">
-            <div className="max-w-4xl mx-auto bg-white shadow-lg rounded-2xl p-8">
-                <Link
-                    to="/books"
-                    className="flex items-center text-primary-700 hover:text-primary-900 mb-6"
-                >
-                    <ArrowLeft className="h-5 w-5 mr-2" />
-                    Retour à la bibliothèque
-                </Link>
+        <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+            <div className="max-w-5xl mx-auto bg-white rounded-2xl shadow-lg overflow-hidden">
+                {/* Back Link */}
+                <div className="px-6 pt-6">
+                    <Link
+                        to="/books"
+                        className="flex items-center text-cyan-700 hover:text-cyan-900 transition-colors font-medium"
+                    >
+                        <ArrowLeft className="h-5 w-5 mr-2" />
+                        Retour à la bibliothèque
+                    </Link>
+                </div>
 
-                <div className="flex flex-col md:flex-row gap-8">
-                    {/* Image / icône du livre */}
-                    <div className="w-full md:w-1/3 flex justify-center">
-                        <div className="w-40 h-56 bg-gradient-to-br from-primary-100 to-primary-200 rounded-lg flex items-center justify-center">
-                            <BookOpen className="h-16 w-16 text-primary-700" />
+                {/* Main Content */}
+                <div className="flex flex-col md:flex-row gap-8 px-6 py-8">
+                    {/* Book Cover / Icon */}
+                    <div className="md:w-1/3 flex justify-center">
+                        <div className="w-44 h-64 bg-gradient-to-br from-cyan-100 to-cyan-200 rounded-xl flex items-center justify-center shadow-md transition-transform transform hover:scale-105">
+                            <BookOpen className="h-16 w-16 text-cyan-700" />
                         </div>
                     </div>
 
-                    {/* Détails du livre */}
-                    <div className="flex-1">
-                        <h1 className="text-3xl font-bold text-gray-900 mb-2">{book.title}</h1>
-                        <p className="text-lg text-gray-600 mb-4">by {book.author}</p>
+                    {/* Book Details */}
+                    <div className="md:w-2/3 flex-1 flex flex-col justify-between">
+                        <div>
+                            <h1 className="text-3xl font-bold text-gray-900 mb-2">{book.title}</h1>
+                            <p className="text-lg text-gray-600 mb-4">by {book.author}</p>
+                            <p className="text-gray-700 mb-6 leading-relaxed">{book.description}</p>
 
-                        <p className="text-gray-700 mb-6">{book.description}</p>
-
-                        <div className="space-y-2 text-sm text-gray-600">
-                            <p>
-                                <span className="font-medium text-gray-800">Category:</span>{' '}
-                                {book.category?.name || 'Uncategorized'}
-                            </p>
-                            <p>
-                                <span className="font-medium text-gray-800">Availability:</span>{' '}
-                                {book.available ? 'Available' : 'Currently loaned'}
-                            </p>
-                            <p>
-                                <span className="font-medium text-gray-800">Format:</span>{' '}
-                                {book.is_ebook ? 'E-Book' : 'Physical copy'}
-                            </p>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm text-gray-600">
+                                <div>
+                                    <span className="font-medium text-gray-800">Category:</span>{' '}
+                                    {book.category?.name || 'Uncategorized'}
+                                </div>
+                                <div>
+                                    <span className="font-medium text-gray-800">Availability:</span>{' '}
+                                    {book.available ? 'Available' : 'Currently loaned'}
+                                </div>
+                                <div>
+                                    <span className="font-medium text-gray-800">Format:</span>{' '}
+                                    {book.is_ebook ? 'E-Book' : 'Physical copy'}
+                                </div>
+                            </div>
                         </div>
 
-                        <button className="mt-6 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-lg shadow-md">
-                            Borrow this book
-                        </button>
+                        {/* Borrow Button */}
+                        <div className="mt-6">
+                            <button className="w-full sm:w-auto bg-cyan-600 hover:bg-cyan-700 text-white font-semibold py-3 px-6 rounded-xl shadow-lg transition-transform transform hover:-translate-y-1">
+                                Borrow this book
+                            </button>
+                        </div>
                     </div>
                 </div>
+
+                {/* Optional: Similar Books / Recommendations */}
+                {/* Could add a section here if needed */}
             </div>
         </div>
     );

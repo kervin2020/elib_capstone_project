@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Search, Filter, Plus, Grid, List, Eye, BookOpen } from 'lucide-react';
+import { Search, Filter, Plus, Grid, List, BookOpen } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useBooks } from '../contexts/BookContext';
 import { useLoans } from '../contexts/LoanContext';
@@ -35,12 +35,9 @@ const BooksPage = () => {
   const [viewMode, setViewMode] = useState('grid');
   const [showFilters, setShowFilters] = useState(false);
 
-  // Initialize search from URL params
   useEffect(() => {
     const search = searchParams.get('search');
-    if (search) {
-      searchBooks(search);
-    }
+    if (search) searchBooks(search);
   }, [searchParams, searchBooks]);
 
   const handleSearch = (e) => {
@@ -50,13 +47,8 @@ const BooksPage = () => {
     setSearchParams({ search: query });
   };
 
-  const handleCategoryFilter = (categoryId) => {
-    filterByCategory(categoryId);
-  };
-
-  const handleFilterChange = (newFilters) => {
-    applyFilters(newFilters);
-  };
+  const handleCategoryFilter = (categoryId) => filterByCategory(categoryId);
+  const handleFilterChange = (newFilters) => applyFilters(newFilters);
 
   const handleLoan = async (bookId) => {
     if (!isAuthenticated) {
@@ -77,40 +69,34 @@ const BooksPage = () => {
     }
   };
 
-  const handleViewBook = (book) => {
-    setSelectedBook(book);
-  };
+  const handleViewBook = (book) => setSelectedBook(book);
 
   const filteredBooks = getFilteredBooks();
 
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Header */}
-        <div className="mb-8">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900">Books</h1>
-              <p className="text-gray-600 mt-2">
-                Browse our collection of digital and physical books
-              </p>
-            </div>
 
-            {user?.is_admin && (
-              <button
-                onClick={() => setShowAddModal(true)}
-                className="mt-4 sm:mt-0 btn-primary flex items-center space-x-2"
-              >
-                <Plus className="h-4 w-4" />
-                <span>Add Book</span>
-              </button>
-            )}
+        {/* Header */}
+        <div className="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">Books</h1>
+            <p className="text-gray-600 mt-2">Browse our collection of digital and physical books</p>
           </div>
+
+          {user?.is_admin && (
+            <button
+              onClick={() => setShowAddModal(true)}
+              className="btn-primary flex items-center space-x-2 px-4 py-2 rounded-lg shadow-md hover:shadow-lg transition-transform transform hover:-translate-y-1"
+            >
+              <Plus className="h-4 w-4" />
+              <span>Add Book</span>
+            </button>
+          )}
         </div>
 
-        {/* Search and Filters */}
-        <div className="bg-white rounded-lg shadow-sm border p-6 mb-8">
-          {/* Search Bar */}
+        {/* Search & Filters */}
+        <div className="bg-white rounded-xl shadow-md border p-6 mb-8 transition-all duration-300">
           <form onSubmit={handleSearch} className="mb-6">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
@@ -119,92 +105,77 @@ const BooksPage = () => {
                 name="search"
                 placeholder="Search books by title, author, or description..."
                 defaultValue={searchQuery}
-                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                className="w-full pl-10 pr-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-cyan-400 focus:outline-none transition"
               />
             </div>
           </form>
 
-          {/* Filter Toggle */}
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <button
               onClick={() => setShowFilters(!showFilters)}
-              className="flex items-center space-x-2 text-gray-600 hover:text-gray-900"
+              className="flex items-center space-x-2 text-gray-600 hover:text-gray-900 transition-colors"
             >
               <Filter className="h-4 w-4" />
               <span>Filters</span>
             </button>
 
             <div className="flex items-center space-x-4">
-              {/* View Mode Toggle */}
+              {/* View Toggle */}
               <div className="flex items-center space-x-2">
                 <button
                   onClick={() => setViewMode('grid')}
-                  className={`p-2 rounded ${viewMode === 'grid' ? 'bg-primary-100 text-primary-900' : 'text-gray-400'}`}
+                  className={`p-2 rounded ${viewMode === 'grid' ? 'bg-cyan-100 text-cyan-900' : 'text-gray-400'}`}
                 >
                   <Grid className="h-4 w-4" />
                 </button>
                 <button
                   onClick={() => setViewMode('list')}
-                  className={`p-2 rounded ${viewMode === 'list' ? 'bg-primary-100 text-primary-900' : 'text-gray-400'}`}
+                  className={`p-2 rounded ${viewMode === 'list' ? 'bg-cyan-100 text-cyan-900' : 'text-gray-400'}`}
                 >
                   <List className="h-4 w-4" />
                 </button>
               </div>
 
-              {/* Results Count */}
-              <span className="text-sm text-gray-600">
-                {filteredBooks.length} books found
-              </span>
+              <span className="text-sm text-gray-600">{filteredBooks.length} books found</span>
             </div>
           </div>
 
           {/* Filters Panel */}
           {showFilters && (
-            <div className="mt-6 pt-6 border-t border-gray-200">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {/* Category Filter */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Category
-                  </label>
-                  <select
-                    value={selectedCategory || ''}
-                    onChange={(e) => handleCategoryFilter(e.target.value || null)}
-                    className="input-field"
-                  >
-                    <option value="">All Categories</option>
-                    {categories.map((category) => (
-                      <option key={category.id} value={category.id}>
-                        {category.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+            <div className="mt-6 pt-6 border-t border-gray-200 grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Category</label>
+                <select
+                  value={selectedCategory || ''}
+                  onChange={(e) => handleCategoryFilter(e.target.value || null)}
+                  className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-cyan-400 focus:outline-none"
+                >
+                  <option value="">All Categories</option>
+                  {categories.map((category) => (
+                    <option key={category.id} value={category.id}>{category.name}</option>
+                  ))}
+                </select>
+              </div>
 
-                {/* Availability Filter */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Availability
-                  </label>
-                  <select
-                    value={filters.available ? 'available' : 'all'}
-                    onChange={(e) => handleFilterChange({ available: e.target.value === 'available' })}
-                    className="input-field"
-                  >
-                    <option value="all">All Books</option>
-                    <option value="available">Available Only</option>
-                  </select>
-                </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Availability</label>
+                <select
+                  value={filters.available ? 'available' : 'all'}
+                  onChange={(e) => handleFilterChange({ available: e.target.value === 'available' })}
+                  className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-cyan-400 focus:outline-none"
+                >
+                  <option value="all">All Books</option>
+                  <option value="available">Available Only</option>
+                </select>
+              </div>
 
-                {/* Clear Filters */}
-                <div className="flex items-end">
-                  <button
-                    onClick={clearFilters}
-                    className="w-full px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
-                  >
-                    Clear Filters
-                  </button>
-                </div>
+              <div className="flex items-end">
+                <button
+                  onClick={clearFilters}
+                  className="w-full px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
+                >
+                  Clear Filters
+                </button>
               </div>
             </div>
           )}
@@ -217,16 +188,10 @@ const BooksPage = () => {
           <div className="text-center py-12">
             <BookOpen className="h-12 w-12 text-gray-400 mx-auto mb-4" />
             <h3 className="text-lg font-medium text-gray-900 mb-2">No books found</h3>
-            <p className="text-gray-600">
-              Try adjusting your search criteria or filters
-            </p>
+            <p className="text-gray-600">Try adjusting your search criteria or filters</p>
           </div>
         ) : (
-          <div className={
-            viewMode === 'grid'
-              ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'
-              : 'space-y-4'
-          }>
+          <div className={viewMode === 'grid' ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6' : 'space-y-4'}>
             {filteredBooks.map((book) => (
               <BookCard
                 key={book.id}
@@ -240,7 +205,7 @@ const BooksPage = () => {
           </div>
         )}
 
-        {/* Book Detail Modal */}
+        {/* Modals */}
         {selectedBook && (
           <BookDetailModal
             isOpen={!!selectedBook}
@@ -249,12 +214,7 @@ const BooksPage = () => {
             onLoan={handleLoan}
           />
         )}
-
-        {/* Add Book Modal */}
-        <AddBookModal
-          isOpen={showAddModal}
-          onClose={() => setShowAddModal(false)}
-        />
+        <AddBookModal isOpen={showAddModal} onClose={() => setShowAddModal(false)} />
       </div>
     </div>
   );

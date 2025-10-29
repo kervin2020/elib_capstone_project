@@ -39,9 +39,9 @@ def create_user():
     """ 
      creer une nouvelle utilisateur
 
-     tag:
-       - users
-    parameter:
+     tags:
+       - Utilisateurs
+     parameters:
         - in: body
           name: user
           schema:
@@ -99,9 +99,9 @@ def get_users():
     liste tous les utilisateurs (administrateur requis)
 
     tags:
-        - users
-    securite:
-        - jwt: [ ]
+      - Utilisateurs
+    security:
+      - jwt: []
     responses:
         200:
             description: Liste des utilisateurs
@@ -133,9 +133,9 @@ def get_user(user_id):
     afficher un utilisateur specifique (administrateur ou proprietaire requis)
 
     tags:
-        - users
-    securite:
-        - jwt: [ ]
+      - Utilisateurs
+    security:
+      - jwt: []
     responses:
         200:
             description: Détails de l'utilisateur
@@ -161,6 +161,36 @@ def get_user(user_id):
 @user_bp.route('/users/<int:user_id>', methods=['PUT'])
 @jwt_required()
 def update_user(user_id):
+    """
+    Mettre à jour un utilisateur (administrateur ou propriétaire requis)
+    ---
+    tags:
+      - Utilisateurs
+    security:
+      - jwt: []
+    parameters:
+      - name: user_id
+        in: path
+        type: integer
+        required: true
+        description: ID de l'utilisateur à mettre à jour
+      - in: body
+        name: body
+        schema:
+          type: object
+          properties:
+            username:
+              type: string
+            email:
+              type: string
+            password:
+              type: string
+    responses:
+      200:
+        description: Utilisateur mis à jour avec succès
+      403:
+        description: Accès interdit
+    """
     err = _require_admin(user_id)
     if err:
         return err
@@ -195,9 +225,15 @@ def delete_user(user_id):
     suprimmer un tilisateur (administrateur ou proprietaire requis)
 
     tags:
-        - users
-        securite:
-        - jwt: [ ]
+      - Utilisateurs
+    security:
+      - jwt: []
+    parameters:
+      - name: user_id
+        in: path
+        type: integer
+        required: true
+        description: ID de l'utilisateur à supprimer
     responses:
         200:
             description: Utilisateur supprimé avec succès
@@ -224,12 +260,12 @@ def get_current_user():
     récupérer l'utilisateur connecté
 
     tags:
-         -users
-    securite:
-        - jwt: [ ]
+      - Utilisateurs
+    security:
+      - jwt: []
     responses:
         200:
-            description: Détails de l'utilisateur connecté   
+            description: Détails de l'utilisateur connecté
 
     """
     user_id = get_jwt_identity()
@@ -248,22 +284,22 @@ def get_current_user():
 def login():
     """
     connexion utilisateur
-
-     tags:
-        - users
-    parameter:
-        - in: body
-          name: credentials
-          schema:
-            type: object
-            properties:
-              email:
-                type: string
-                password:
-                type: string
-            required:
-              - email
-              - password
+    ---
+    tags:
+      - Authentification
+    parameters:
+      - in: body
+        name: credentials
+        schema:
+          type: object
+          properties:
+            email:
+              type: string
+            password:
+              type: string
+          required:
+            - email
+            - password
     responses:
         200:
             description: Connexion réussie

@@ -20,25 +20,7 @@ swagger_template = {
     "swagger": "2.0",
     "info": {
         "title": "E-Lib API - Système de Gestion de Bibliothèque",
-        "description": """
-        API REST complète pour la gestion d'une bibliothèque numérique.
-        
-        # Fonctionnalités
-        -  Authentification JWT
-        -  Gestion des utilisateurs
-        -  Gestion des ebooks
-        - Système d'emprunt (14 jours)
-        - Catégories de livres
-        
-        # Authentification
-        1. Créer un compte : `POST /api/users`
-        2. Se connecter : `POST /api/login`
-        3. Utiliser le token : `Authorization: Bearer <token>`
-        
-        # Compte Admin par défaut
-        - Email : `admin@elib.com`
-        - Password : `Admin@123`
-        """,
+        "description": "API pour le système de gestion de bibliothèque E-Lib.",
         "version": "1.0.0",
         "contact": {
             "name": "Support E-Lib",
@@ -46,7 +28,7 @@ swagger_template = {
         }
     },
     "host": "localhost:5000",
-    "basePath": "/api",
+    "basePath": "/",
     "schemes": ["http"],
     "securityDefinitions": {
         "jwt": {

@@ -9,16 +9,7 @@ loan_bp = Blueprint('loan_bp', __name__)
 
 # Check if user is admin
 def _require_admin():
-    """
-    Vérifie si l'utilisateur est administrateur
-    securite:
-        -jwt:[]
-        response:
-        200:
-            description: Accès autorisé
-            403:
-            description: Accès interdit, vous n'êtes pas administrateur
-    """
+    """Vérifie si l'utilisateur est administrateur"""
     user = User.query.get(get_jwt_identity())
     if not user or not user.is_admin:
         return jsonify({"msg": "Accès interdit, vous n'êtes pas administrateur"}), 403
@@ -33,7 +24,7 @@ def create_loan():
     creer un nouvel emprunt
 
     tags:
-      - loans
+      - Emprunts
     security:
       - jwt: []
     parameters:
@@ -96,7 +87,7 @@ def get_loans():
     Récupérer tous les prêts
 
     tags:
-        - loans
+        - Emprunts
     responses:
         200:
             description: Liste des prêts récupérés
@@ -132,7 +123,7 @@ def get_loan(loan_id):
     Récupérer un prêt par son ID
 
     tags:
-        - loans 
+        - Emprunts 
     parameters:
         - in: path
           name: loan_id
@@ -169,22 +160,22 @@ def update_loan(loan_id):
     retourner un prêt
 
     tags:
-        - loans
-        security:
-          - jwt: []
-            parameters:
-              - in: path
-                name: loan_id
-                required: true
-                schema:
-                  type: integer
-            responses:
-                200:
-                    description: prêt retourné avec succès
-                403:
-                    description: Accès interdit, vous n'êtes pas propriétaire de ce prêt
-                400:
-                    description: Ce prêt a déjà été retourné
+        - Emprunts
+    security:
+      - jwt: []
+    parameters:
+      - in: path
+        name: loan_id
+        required: true
+        schema:
+          type: integer
+    responses:
+        200:
+            description: prêt retourné avec succès
+        403:
+            description: Accès interdit, vous n'êtes pas propriétaire de ce prêt
+        400:
+            description: Ce prêt a déjà été retourné
     """
     loan = Loan.query.get_or_404(loan_id)
 
@@ -215,15 +206,18 @@ def update_loan(loan_id):
 def get_user_loans(user_id):
     """
     Récupérer les prêts d'un utilisateur
-    
+    ---
     tags:
-        - loans
+      - Emprunts
+    security:
+      - jwt: []
     parameters:
-        - in: path
-          name: user_id
-          required: true
-          schema:
-            type: integer
+      - in: path
+        name: user_id
+        required: true
+        schema:
+          type: integer
+        description: ID de l'utilisateur pour lequel récupérer les prêts
     responses:
         200:
             description: Liste des prêts de l'utilisateur récupérée
@@ -257,18 +251,18 @@ def delete_loan(loan_id):
     Supprimer un prêt
 
     tags:
-        - loans
-
-        parameters:
+        - Emprunts
+    security:
+      - jwt: []
+    parameters:
         - in: path
           name: loan_id
           required: true
           schema:
             type: integer
-            responses:
-                200:
-                    description: prêt supprimé avec succès
-
+    responses:
+        200:
+            description: prêt supprimé avec succès
     """
     err = _require_admin()
     if err:

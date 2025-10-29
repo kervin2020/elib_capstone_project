@@ -7,16 +7,7 @@ category_bp = Blueprint('category_bp', __name__)
 
 # Check if user is admin
 def _require_admin():
-    """
-    verifie si l'utilisateur est administrateur
-    securite:
-        -jwt:[]
-    response:
-        200:
-            description: Accès autorisé
-        403:
-            description: Accès interdit, vous n'êtes pas administrateur
-    """
+    """Vérifie si l'utilisateur est administrateur"""
     user = User.query.get(get_jwt_identity())
     if not user or not user.is_admin:
         return jsonify({"msg": "Accès interdit, vous n'êtes pas administrateur"}), 403
@@ -29,23 +20,23 @@ def _require_admin():
 def create_category():
     """
     creer une nouvelle catégorie
-    
-      tags:
-        - categories
-        security:
-          - jwt: []
-        parameters:
-          - in: body
-            name: category
-            schema:
-                type: object
-                properties:
-                    name:
-                    type: string
-                    description:
-                    type: string
-                required:
-                    - name
+    ---
+    tags:
+      - Catégories
+    security:
+      - jwt: []
+    parameters:
+      - in: body
+        name: category
+        schema:
+          type: object
+          properties:
+            name:
+              type: string
+            description:
+              type: string
+          required:
+            - name
         responses:
             201:
                 description: Catégorie créée
@@ -86,7 +77,7 @@ def get_categories():
     Récupérer toutes les catégories
 
     tags:
-        - categories
+        - Catégories
     responses:
         200:
             description: Liste des catégories récupérées
@@ -108,11 +99,12 @@ def get_categories():
 def get_category(category_id):
     """
     Récupérer une catégorie par son ID
-    
+    ---
     tags:
-        - categories
+        - Catégories
     parameters:
-        - in: path
+        - name: category_id
+          in: path
           name: category_id
           required: true
           schema:
@@ -137,15 +129,26 @@ def get_category(category_id):
 def update_category(category_id):
     """
     Mettre à jour une catégorie par son ID
-
+    ---
     tags:
-        - categories
+        - Catégories
+    security:
+      - jwt: []
     parameters:
         - in: path
           name: category_id
           required: true
           schema:
             type: integer
+        - in: body
+          name: body
+          schema:
+            type: object
+            properties:
+              name:
+                type: string
+              description:
+                type: string
     responses:
         200:
             description: Catégorie mise à jour
@@ -179,9 +182,11 @@ def update_category(category_id):
 def delete_category(category_id):
     """
     Supprimer une catégorie par son ID
-
+    ---
     tags:
-        - categories
+        - Catégories
+    security:
+      - jwt: []
     parameters:
         - in: path
           name: category_id

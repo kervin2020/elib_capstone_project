@@ -18,7 +18,6 @@ from routes.route_user import user_bp
 from routes.routes_ebook import ebook_bp
 from routes.route_category import category_bp
 from routes.route_loan import loan_bp
-from api_docs import api_bp
 
 # Import des utilitaires
 from utils.check_expired_loans import check_and_notify
@@ -81,7 +80,6 @@ def create_app():
     app.register_blueprint(ebook_bp, url_prefix='/api')
     app.register_blueprint(category_bp, url_prefix='/api')
     app.register_blueprint(loan_bp, url_prefix='/api')
-    app.register_blueprint(api_bp)
 
     # Création des tables si elles n'existent pas
     with app.app_context():

@@ -20,6 +20,31 @@ def _require_admin():
 @ebook_bp.route('/ebooks', methods=['POST'])
 @jwt_required()
 def create_ebook():
+    """
+    Créer un nouvel ebook (Admin requis)
+    ---
+    tags:
+      - Ebooks
+    security:
+      - jwt: []
+    parameters:
+      - in: body
+        name: body
+        schema:
+          type: object
+          properties:
+            title:
+              type: string
+            author:
+              type: string
+            description:
+              type: string
+            total_copies:
+              type: integer
+    responses:
+      201:
+        description: Ebook créé avec succès
+    """
     err = _require_admin()
     if err:
         return err
@@ -73,6 +98,15 @@ def create_ebook():
 # Récupérer tous les ebooks
 @ebook_bp.route('/ebooks', methods=['GET'])
 def get_ebooks():
+    """
+    Récupérer la liste de tous les ebooks
+    ---
+    tags:
+      - Ebooks
+    responses:
+      200:
+        description: Une liste d'ebooks
+    """
     ebooks = Ebook.query.all()
     return jsonify({'ebooks': [
         {
@@ -91,6 +125,21 @@ def get_ebooks():
 # Récupérer un ebook par ID
 @ebook_bp.route('/ebooks/<int:ebook_id>', methods=['GET'])
 def get_ebook(ebook_id):
+    """
+    Récupérer un ebook par son ID
+    ---
+    tags:
+      - Ebooks
+    parameters:
+      - name: ebook_id
+        in: path
+        type: integer
+        required: true
+        description: ID de l'ebook à récupérer
+    responses:
+      200:
+        description: Détails de l'ebook
+    """
     ebook = Ebook.query.get_or_404(ebook_id)
     return jsonify({
         'id': ebook.id,
@@ -108,6 +157,33 @@ def get_ebook(ebook_id):
 @ebook_bp.route('/ebooks/<int:ebook_id>', methods=['PUT'])
 @jwt_required()
 def update_ebook(ebook_id):
+    """
+    Mettre à jour un ebook (Admin requis)
+    ---
+    tags:
+      - Ebooks
+    security:
+      - jwt: []
+    parameters:
+      - name: ebook_id
+        in: path
+        type: integer
+        required: true
+      - in: body
+        name: body
+        schema:
+          type: object
+          properties:
+            title:
+              type: string
+            author:
+              type: string
+            description:
+              type: string
+    responses:
+      200:
+        description: Ebook mis à jour avec succès
+    """
     err = _require_admin()
     if err:
         return err
@@ -149,6 +225,22 @@ def update_ebook(ebook_id):
 @ebook_bp.route('/ebooks/<int:ebook_id>', methods=['DELETE'])
 @jwt_required()
 def delete_ebook(ebook_id):
+    """
+    Supprimer un ebook (Admin requis)
+    ---
+    tags:
+      - Ebooks
+    security:
+      - jwt: []
+    parameters:
+      - name: ebook_id
+        in: path
+        type: integer
+        required: true
+    responses:
+      200:
+        description: Ebook supprimé avec succès
+    """
     err = _require_admin()
     if err:
         return err
